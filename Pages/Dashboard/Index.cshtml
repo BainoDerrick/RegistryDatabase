@@ -1,0 +1,243 @@
+@page
+@model RegistryAPI.Pages.Dashboard.IndexModel
+@using System.Globalization
+@{
+    ViewData["Title"] = "Dashboard";
+
+    // Extract first name from email
+    var userName = User.Identity?.Name;
+    var firstName = "User";
+
+    if (!string.IsNullOrEmpty(userName) && userName.Contains('@'))
+    {
+        firstName = userName.Split('@')[0];
+        // Capitalize first letter
+        firstName = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(firstName.ToLower());
+    }
+    else if (!string.IsNullOrEmpty(userName))
+    {
+        firstName = userName;
+    }
+}
+
+<div class="container-fluid">
+    <!-- Welcome Message Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="alert alert-info">
+                <h4 class="alert-heading">Welcome back, @firstName! 👋</h4>
+                <p class="mb-0">Here's an overview of your registry system.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Dashboard</h1>
+        <a asp-page="/Account/Logout" class="btn btn-outline-danger">Logout</a>
+    </div>
+
+    <!-- First Row: Core Statistics -->
+    <div class="row">
+        <div class="col-md-3">
+            <div class="card text-white bg-primary mb-3">
+                <div class="card-header">Departments</div>
+                <div class="card-body">
+                    <h5 class="card-title">@Model.DepartmentCount</h5>
+                    <p class="card-text">Total Departments</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-success mb-3">
+                <div class="card-header">Staff</div>
+                <div class="card-body">
+                    <h5 class="card-title">@Model.StaffCount</h5>
+                    <p class="card-text">Total Staff Members</p>
+                    <small>@Model.ActiveStaffCount Active, @Model.InactiveStaffCount Inactive</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-info mb-3">
+                <div class="card-header">Files</div>
+                <div class="card-body">
+                    <h5 class="card-title">@Model.FileCount</h5>
+                    <p class="card-text">Total Files</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-warning mb-3">
+                <div class="card-header">Documents</div>
+                <div class="card-body">
+                    <h5 class="card-title">@Model.DocumentCount</h5>
+                    <p class="card-text">Total Documents</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Second Row: Transactions and Terminations -->
+    <div class="row">
+        <div class="col-md-3">
+            <div class="card text-white bg-secondary mb-3">
+                <div class="card-header">Transactions</div>
+                <div class="card-body">
+                    <h5 class="card-title">@Model.TransactionCount</h5>
+                    <p class="card-text">Total Transactions</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-danger mb-3">
+                <div class="card-header">Terminations</div>
+                <div class="card-body">
+                    <h5 class="card-title">@Model.TerminationCount</h5>
+                    <p class="card-text">Staff Terminations</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-dark mb-3">
+                <div class="card-header">Active Staff</div>
+                <div class="card-body">
+                    <h5 class="card-title">@Model.ActiveStaffCount</h5>
+                    <p class="card-text">Currently Active</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-info mb-3">
+                <div class="card-header">Staff Status</div>
+                <div class="card-body">
+                    <h5 class="card-title">@Model.ActiveStaffCount / @Model.InactiveStaffCount</h5>
+                    <p class="card-text">Active / Inactive</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Quick Actions</h5>
+                </div>
+                <div class="card-body">
+                    <div class="list-group">
+                        <a href="/Staff" class="list-group-item list-group-item-action">Manage Staff</a>
+                        <a href="/Department" class="list-group-item list-group-item-action">Manage Departments</a>
+                        <a href="/File" class="list-group-item list-group-item-action">Manage Files</a>
+                        <a href="/Document" class="list-group-item list-group-item-action">Manage Documents</a>
+                        <a href="/Transactions" class="list-group-item list-group-item-action">View Transactions</a>
+                        <a href="/Termination" class="list-group-item list-group-item-action">Manage Terminations</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5>Recent Transactions</h5>
+                    <span class="badge bg-primary">Last 10</span>
+                </div>
+                <div class="card-body">
+                    @if (Model.RecentTransactions.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Type</th>
+                                        <th>Date</th>
+                                        <th>Staff</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var transaction in Model.RecentTransactions)
+                                    {
+                                        <tr>
+                                            <td>
+                                                <span class="badge bg-info">@transaction.TransactionType</span>
+                                            </td>
+                                            <td>@transaction.TransactionDate.ToString("MMM dd, yyyy")</td>
+                                            <td>@transaction.StaffName</td>
+                                            <td>
+                                                <span
+                                                    class="badge @(transaction.Status == "Completed" ? "bg-success" : "bg-warning")">
+                                                    @transaction.Status
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <p class="text-muted">No recent transactions found.</p>
+                    }
+                    <div class="text-center mt-3">
+                        <a href="/Transactions" class="btn btn-sm btn-outline-primary">View All Transactions</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- System Health Section -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5>System Overview</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="d-flex justify-content-between">
+                                <span>Staff Management:</span>
+                                <span class="badge bg-success">Operational</span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="d-flex justify-content-between">
+                                <span>Document Tracking:</span>
+                                <span class="badge bg-success">Operational</span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="d-flex justify-content-between">
+                                <span>Transaction System:</span>
+                                <span class="badge bg-success">Operational</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card {
+        transition: transform 0.2s;
+    }
+
+    .card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .badge {
+        font-size: 0.75em;
+    }
+
+    .alert-info {
+        background-color: #d1ecf1;
+        border-color: #bee5eb;
+        color: #0c5460;
+    }
+</style>
