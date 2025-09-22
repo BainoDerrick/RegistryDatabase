@@ -1,0 +1,18 @@
+@page
+@model RegistryAPI.Pages.IndexModel
+@{
+    ViewData["Title"] = "Welcome to Registry System";
+    Layout = "_LayoutMinimal";
+}
+
+<div class="row justify-content-center mt-5">
+    <div class="col-md-6 text-center">
+        <h1 class="display-4 mb-4">Welcome to Registry System</h1>
+        <p class="lead mb-4">Manage departments, staff, files, and documents efficiently</p>
+
+        <div class="d-grid gap-2 col-6 mx-auto">
+            <a asp-page="/Account/Login" class="btn btn-primary btn-lg">Login</a>
+            <a asp-page="/Account/Register" class="btn btn-outline-secondary btn-lg">Register</a>
+        </div>
+    </div>
+</div>

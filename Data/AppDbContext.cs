@@ -1,10 +1,12 @@
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using RegistryAPI.Models;
 using File = RegistryAPI.Models.File;
 
 namespace RegistryAPI.Data
 {
-      public class AppDbContext : DbContext
+      public class AppDbContext : IdentityDbContext<IdentityUser, IdentityRole, string>
       {
             public DbSet<Staff> Staff { get; set; }
             public DbSet<Department> Departments { get; set; }
@@ -14,6 +16,7 @@ namespace RegistryAPI.Data
             public DbSet<Transaction> Transactions { get; set; }
             public DbSet<Termination> Terminations { get; set; }
             public DbSet<Sequence> Sequences { get; set; }
+            public new DbSet<IdentityRole> Roles { get; set; } // Explicitly defined for clarity
 
             public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
             {
@@ -21,7 +24,9 @@ namespace RegistryAPI.Data
 
             protected override void OnModelCreating(ModelBuilder modelBuilder)
             {
-                  // Staff configuration (unchanged)
+                  base.OnModelCreating(modelBuilder); // Must call base to configure Identity tables
+
+                  // Staff configuration
                   modelBuilder.Entity<Staff>(entity =>
                   {
                         entity.ToTable("staff");
@@ -48,7 +53,7 @@ namespace RegistryAPI.Data
                       .OnDelete(DeleteBehavior.Restrict);
                   });
 
-                  // Department configuration (unchanged)
+                  // Department configuration
                   modelBuilder.Entity<Department>(entity =>
                   {
                         entity.ToTable("department");
@@ -65,7 +70,7 @@ namespace RegistryAPI.Data
                       .HasForeignKey(s => s.DeptCode);
                   });
 
-                  // File configuration (unchanged)
+                  // File configuration
                   modelBuilder.Entity<File>(entity =>
                   {
                         entity.ToTable("files");
@@ -83,7 +88,7 @@ namespace RegistryAPI.Data
                       .OnDelete(DeleteBehavior.Restrict);
                   });
 
-                  // Document configuration (unchanged)
+                  // Document configuration
                   modelBuilder.Entity<Document>(entity =>
                   {
                         entity.ToTable("documents");
@@ -123,7 +128,7 @@ namespace RegistryAPI.Data
                         entity.Property(t => t.CreatedBy).HasColumnName("created_by").IsRequired();
                         entity.Property(t => t.CreatedDate).HasColumnName("created_date").HasDefaultValueSql("CURRENT_TIMESTAMP");
                         entity.Property(t => t.UpdatedBy).HasColumnName("updated_by");
-                        entity.Property(t => t.UpdatedDate).HasColumnName("updated_date"); // Corrected to updated_date
+                        entity.Property(t => t.UpdatedDate).HasColumnName("updated_date");
                         entity.HasOne(t => t.Staff)
                       .WithMany(s => s.Transactions)
                       .HasForeignKey(t => t.StaffId)
@@ -134,7 +139,7 @@ namespace RegistryAPI.Data
                       .OnDelete(DeleteBehavior.Restrict);
                   });
 
-                  // Termination configuration (unchanged)
+                  // Termination configuration
                   modelBuilder.Entity<Termination>(entity =>
                   {
                         entity.ToTable("termination");
@@ -151,7 +156,7 @@ namespace RegistryAPI.Data
                       .HasForeignKey<Termination>(t => t.StaffId);
                   });
 
-                  // Sequence configuration (unchanged)
+                  // Sequence configuration
                   modelBuilder.Entity<Sequence>(entity =>
                   {
                         entity.ToTable("sequence");
@@ -164,7 +169,7 @@ namespace RegistryAPI.Data
                         entity.Property(s => s.CreateDate).HasColumnName("create_date");
                   });
 
-                  // DocumentType configuration (unchanged)
+                  // DocumentType configuration
                   modelBuilder.Entity<DocumentType>(entity =>
                   {
                         entity.ToTable("document_type");
@@ -177,6 +182,13 @@ namespace RegistryAPI.Data
                         entity.Property(dt => dt.UpdatedBy).HasColumnName("updated_by");
                         entity.Property(dt => dt.UpdateDate).HasColumnName("update_date");
                   });
+
+                  // Ensure IdentityRole is configured (optional, as base handles it)
+                  modelBuilder.Entity<IdentityRole>(entity =>
+                  {
+                        entity.ToTable("AspNetRoles");
+                  });
             }
       }
 }
+// Explanation: Inheriting from IdentityDbContext<IdentityUser, IdentityRole, string> configures the Identity schema (AspNetUsers, AspNetRoles, etc.). The base.OnModelCreating call sets up Identity tables, and your custom mappings for Staff and other entities are preserved. The explicit Roles DbSet ensures role querying works.
