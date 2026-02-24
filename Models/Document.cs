@@ -20,7 +20,7 @@ namespace RegistryAPI.Models
         public string? Description { get; set; }
         [Column("scanned")]
         public bool? Scanned { get; set; }
-        [Column("scan_file_data")]
+        [Column("scan_file_data", TypeName = "longblob")]
         public byte[]? ScanFileData { get; set; }
         [Column("created_by")]
         public string? CreatedBy { get; set; }

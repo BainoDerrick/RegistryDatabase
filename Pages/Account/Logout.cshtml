@@ -5,18 +5,101 @@
     Layout = "_LayoutMinimal";
 }
 
-<div class="row justify-content-center mt-5">
-    <div class="col-md-6 text-center">
-        <div class="card">
-            <div class="card-body">
-                <h2>Logout</h2>
-                <p>Are you sure you want to logout?</p>
+<div class="container-fluid min-vh-100 d-flex align-items-center bg-light">
+    <div class="row w-100 justify-content-center">
 
-                <form method="post">
-                    <button type="submit" class="btn btn-danger">Yes, Logout</button>
-                    <a asp-page="/Dashboard" class="btn btn-secondary">Cancel</a>
-                </form>
+        <div class="col-12 col-md-10 col-lg-8 col-xl-6">
+            <div class="card border-0 shadow-sm">
+
+                <!-- HEADER -->
+                <div class="card-header bg-white border-0 text-center py-4">
+                    <div class="mb-3">
+                        <i class="fas fa-sign-out-alt" style="font-size: 3rem; color: #dc3545;"></i>
+                    </div>
+
+                    <h3 class="fw-bold text-uganda-primary mb-1">
+                        Confirm Logout
+                    </h3>
+
+                    <p class="text-muted mb-0">
+                        Ministry of Works and Transport — Document Registry System
+                    </p>
+                </div>
+                <!-- BODY -->
+                <div class="card-body p-4 p-lg-5 text-center">
+
+                    <p class="fs-5 text-muted mb-4">
+                        You are about to end your current session.
+                        <br class="d-none d-md-block" />
+                        Any unsaved work may be lost.
+                    </p>
+
+                    <form method="post" class="d-flex flex-column flex-md-row justify-content-center gap-3">
+                        <button type="submit" class="btn btn-uganda-danger btn-lg px-5">
+                            <i class="fas fa-power-off me-2"></i>
+                            Yes, Logout
+                        </button>
+
+                        <a asp-page="/Dashboard" class="btn btn-outline-secondary btn-lg px-5">
+                            <i class="fas fa-arrow-left me-2"></i>
+                            Cancel
+                        </a>
+                    </form>
+                </div>
+
+                <!-- FOOTER -->
+                <div class="card-footer bg-white border-0 text-center py-3">
+                    <small class="text-muted">
+                        © @(DateTime.Now.Year) Ministry of Works and Transport — Government of Uganda
+                    </small>
+                </div>
+
             </div>
         </div>
+
     </div>
 </div>
+
+<style>
+    :root {
+        --uganda-primary: #0066cc;
+        --uganda-danger: #d90000;
+        --uganda-danger-light: rgba(217, 0, 0, 0.1);
+    }
+
+    .text-uganda-primary {
+        color: var(--uganda-primary) !important;
+    }
+
+    .logout-badge {
+        width: 72px;
+        height: 72px;
+        background: linear-gradient(135deg, var(--uganda-danger), #a80000);
+        border-radius: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        font-size: 30px;
+    }
+
+    .btn-uganda-danger {
+        background-color: var(--uganda-danger);
+        border: none;
+        color: #fff;
+        font-weight: 500;
+    }
+
+    .btn-uganda-danger:hover {
+        background-color: #b00000;
+        color: #fff;
+    }
+
+    .btn-outline-secondary {
+        font-weight: 500;
+    }
+
+    .card {
+        border-radius: 20px;
+    }
+</style>

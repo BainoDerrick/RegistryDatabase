@@ -7,6 +7,7 @@ namespace RegistryAPI.Models
     public class File
     {
         [Column("file_id")]
+        [System.ComponentModel.DataAnnotations.Schema.DatabaseGenerated(System.ComponentModel.DataAnnotations.Schema.DatabaseGeneratedOption.Identity)]
         public int FileId { get; set; }
         [Column("staff_id")]
         public string? StaffId { get; set; }

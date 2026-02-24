@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("RegistryAPI")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+41957ce4e5c800cd5f59f5afa1eb393d62ea1726")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+2ba67daf8f6f6a82e58d48ca24b59118209dc173")]
 [assembly: System.Reflection.AssemblyProductAttribute("RegistryAPI")]
 [assembly: System.Reflection.AssemblyTitleAttribute("RegistryAPI")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

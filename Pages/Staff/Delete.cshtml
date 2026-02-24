@@ -1,0 +1,165 @@
+@page "{id}"
+@model RegistryAPI.Pages.Staff.DeleteModel
+@{
+    ViewData["Title"] = "Delete Staff";
+
+    var userName = User.Identity?.Name;
+    var firstName = "User";
+
+    if (!string.IsNullOrEmpty(userName) && userName.Contains('@'))
+    {
+        firstName = userName.Split('@')[0];
+        firstName = System.Globalization.CultureInfo.CurrentCulture.TextInfo
+        .ToTitleCase(firstName.ToLower());
+    }
+    else if (!string.IsNullOrEmpty(userName))
+    {
+        firstName = userName;
+    }
+}
+
+<div class="container-fluid px-4">
+
+    <!-- Header -->
+    <div class="row align-items-center mb-4 pt-3">
+        <div class="col-md-8">
+            <div class="d-flex align-items-center">
+                <div class="me-3">
+                    <div class="ministry-badge">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                </div>
+                <div>
+                    <h1 class="h3 fw-bold mb-1 text-danger">
+                        Delete Staff Member
+                    </h1>
+                    <p class="text-muted mb-0">
+                        Ministry of Works and Transport - Staff Registry
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CENTERED CARD -->
+    <div class="row justify-content-center">
+        <div class="col-12 col-lg-8 col-xl-6">
+            <div class="card border-0 shadow-sm border-danger border-2">
+                <div class="card-header bg-white border-0 py-3">
+                    <h5 class="mb-0 fw-bold text-danger">
+                        <i class="fas fa-trash-alt text-danger me-2"></i>
+                        Confirm Staff Deletion
+                    </h5>
+                </div>
+
+                <div class="card-body">
+
+                    <!-- Main Warning Alert -->
+                    <div class="alert alert-danger bg-danger-light border-0 mb-4">
+                        <div class="d-flex align-items-start">
+                            <div class="me-3 flex-shrink-0">
+                                <i class="fas fa-exclamation-circle fa-2x"></i>
+                            </div>
+                            <div>
+                                <h6 class="alert-heading fw-bold mb-2">Warning: This action cannot be undone!</h6>
+                                <p class="mb-0">Deleting this staff member will permanently remove their record from the
+                                    system. Any file assignments or references may be affected.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Staff Details -->
+                    <div class="bg-light rounded p-4 mb-4">
+                        <h6 class="fw-bold text-uganda-primary mb-3">
+                            <i class="fas fa-user me-2"></i>Staff Member to be Deleted
+                        </h6>
+
+                        <div class="row g-4">
+                            <div class="col-md-6">
+                                <div class="detail-item">
+                                    <div class="text-muted small fw-medium">Staff ID</div>
+                                    <div class="fw-bold fs-5">
+                                        <i class="fas fa-id-badge text-uganda-primary me-2"></i>
+                                        @Model.StaffItem.StaffId
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-12">
+                                <div class="detail-item">
+                                    <div class="text-muted small fw-medium">Full Name</div>
+                                    <div class="fw-bold fs-5">
+                                        <i class="fas fa-user text-uganda-primary me-2"></i>
+                                        @Model.StaffItem.FirstName @Model.StaffItem.LastName
+                                    </div>
+                                </div>
+                            </div>
+
+                            @if (!string.IsNullOrEmpty(Model.StaffItem.Email))
+                            {
+                                <div class="col-md-6">
+                                    <div class="detail-item">
+                                        <div class="text-muted small fw-medium">Email</div>
+                                        <div class="fw-bold fs-5">
+                                            <i class="fas fa-envelope text-uganda-primary me-2"></i>
+                                            @Model.StaffItem.Email
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+
+                            @if (!string.IsNullOrEmpty(Model.StaffItem.Title))
+                            {
+                                <div class="col-md-6">
+                                    <div class="detail-item">
+                                        <div class="text-muted small fw-medium">Job Title</div>
+                                        <div class="fw-bold fs-5">
+                                            <i class="fas fa-briefcase text-uganda-primary me-2"></i>
+                                            @Model.StaffItem.Title
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+
+                    <!-- Impact Warning -->
+                    <div class="alert alert-warning bg-warning-light border-0 mb-4">
+                        <h6 class="fw-bold mb-2">
+                            <i class="fas fa-exclamation-triangle me-2"></i>Potential Impact
+                        </h6>
+                        <ul class="mb-0 ps-3 small">
+                            <li>Files assigned to this staff member will become unassigned</li>
+                            <li>Historical records will show the staff member as "Deleted"</li>
+                            <li>Audit logs will record the deletion but the record cannot be recovered</li>
+                        </ul>
+                    </div>
+
+                    <!-- Confirmation Form -->
+                    <form method="post" id="deleteForm">
+                        <input type="hidden" asp-for="StaffItem.StaffId" />
+
+                        <div class="form-check mb-4">
+                            <input class="form-check-input" type="checkbox" id="confirmDelete" required>
+                            <label class="form-check-label fw-medium" for="confirmDelete">
+                                I understand that this action is permanent and cannot be undone
+                            </label>
+                        </div>
+
+                        <!-- Actions -->
+                        <div class="d-flex gap-3 mt-4 pt-4 border-top">
+                            <button type="submit" class="btn btn-danger btn-lg px-5 flex-fill" id="deleteBtn" disabled>
+                                <i class="fas fa-trash-alt me-2"></i>Delete Permanently
+                            </button>
+
+                            <a asp-page="Index" class="btn btn-outline-secondary btn-lg px-5">
+                                <i class="fas fa-times me-2"></i>Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Styles and scripts moved to wwwroot/css/pages.css and wwwroot/js/pages.js -->

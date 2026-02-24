@@ -1,0 +1,179 @@
+@page "{id:int}"
+@model RegistryAPI.Pages.File.DetailsModel
+@{
+    ViewData["Title"] = "File Details";
+
+    var userName = User.Identity?.Name;
+    var firstName = "User";
+
+    if (!string.IsNullOrEmpty(userName) && userName.Contains('@'))
+    {
+        firstName = userName.Split('@')[0];
+        firstName = System.Globalization.CultureInfo.CurrentCulture.TextInfo
+        .ToTitleCase(firstName.ToLower());
+    }
+    else if (!string.IsNullOrEmpty(userName))
+    {
+        firstName = userName;
+    }
+}
+
+<div class="container-fluid px-4">
+
+    <!-- Header -->
+    <div class="row align-items-center mb-4 pt-3">
+        <div class="col-md-8">
+            <div class="d-flex align-items-center">
+                <div class="me-3">
+                    <div class="ministry-badge">
+                        <i class="fas fa-folder-open"></i>
+                    </div>
+                </div>
+                <div>
+                    <h1 class="h3 fw-bold mb-1 text-uganda-primary">
+                        File Details
+                    </h1>
+                    <p class="text-muted mb-0">
+                        Ministry of Works and Transport - File Registry
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN CARD -->
+    <div class="row">
+        <div class="col-12 col-lg-10 col-xl-8">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-0 py-3">
+                    <h5 class="mb-0 fw-bold">
+                        <i class="fas fa-info-circle text-uganda-primary me-2"></i>
+                        File Information
+                    </h5>
+                </div>
+
+                <div class="card-body">
+                    <div class="bg-light rounded p-4 mb-4">
+                        <div class="row g-4">
+
+                            <!-- File ID -->
+                            <div class="col-md-6">
+                                <div class="detail-item">
+                                    <div class="text-muted small fw-medium">File ID</div>
+                                    <div class="fw-bold fs-4">
+                                        <i class="fas fa-hashtag text-uganda-primary me-2"></i>
+                                        @Model.FileItem.FileId
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Assigned Staff -->
+                            <div class="col-md-6">
+                                <div class="detail-item">
+                                    <div class="text-muted small fw-medium">Assigned Staff</div>
+                                    <div class="fw-bold fs-5">
+                                        <i class="fas fa-user text-uganda-primary me-2"></i>
+                                        @(!string.IsNullOrEmpty(Model.FileItem.StaffId) ? Model.FileItem.StaffId : "Not assigned")
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Status -->
+                            <div class="col-md-6">
+                                <div class="detail-item">
+                                    <div class="text-muted small fw-medium">File Status</div>
+                                    <div class="fw-bold fs-5">
+                                        <i class="fas fa-info-circle text-uganda-primary me-2"></i>
+                                        <span class="badge bg-uganda-primary-light text-uganda-primary px-3 py-2">
+                                            @Model.FileItem.FileStatus
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="d-flex gap-3 mb-5 border-top pt-4">
+                        <a asp-page="Edit" asp-route-id="@Model.FileItem.FileId" class="btn btn-warning btn-lg px-5">
+                            <i class="fas fa-edit me-2"></i>Edit File
+                        </a>
+
+                        <a asp-page="Index" class="btn btn-outline-secondary btn-lg px-5">
+                            <i class="fas fa-list me-2"></i>Back to List
+                        </a>
+                    </div>
+
+                    <!-- Documents Section -->
+                    <h5 class="fw-bold mb-3">
+                        <i class="fas fa-file-alt text-uganda-primary me-2"></i>
+                        Attached Documents (@(Model.Documents?.Count() ?? 0))
+                    </h5>
+
+                    @if (Model.Documents != null && Model.Documents.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle">
+                                <thead class="bg-light">
+                                    <tr>
+                                        <th>Document Name</th>
+                                        <th>Type</th>
+                                        <th>Date</th>
+                                        <th>Size</th>
+                                        <th class="text-end">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var doc in Model.Documents)
+                                    {
+                                        var sizeKb = doc.ScanFileData != null ? (doc.ScanFileData.Length / 1024) : 0;
+                                        <tr>
+                                            <td>
+                                                <div class="fw-medium">@doc.DocumentName</div>
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-uganda-primary-light text-uganda-primary px-3 py-2">
+                                                    @(doc.DocumentType?.TypeName ?? "—")
+                                                </span>
+                                            </td>
+                                            <td>
+                                                @(doc.DocumentDate.HasValue
+                                                                                        ? doc.DocumentDate.Value.ToString("dd MMM yyyy")
+                                                                                        : "—")
+                                            </td>
+                                            <td>
+                                                @(sizeKb > 0 ? $"{sizeKb} KB" : "—")
+                                            </td>
+                                            <td class="text-end">
+                                                <a asp-page="/Document/Download" asp-route-id="@doc.DocumentId"
+                                                    class="btn btn-sm btn-uganda-primary me-2" title="Download">
+                                                    <i class="fas fa-download"></i>
+                                                </a>
+                                                <a asp-page="/Document/Download" asp-route-id="@doc.DocumentId"
+                                                    asp-route-inline="true" class="btn btn-sm btn-outline-primary"
+                                                    title="Open Inline">
+                                                    <i class="fas fa-external-link-alt"></i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-info border-0">
+                            <i class="fas fa-info-circle me-2"></i>
+                            No documents have been uploaded for this file yet.
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- Styles moved to ~/css/pages.css (consolidated) -->

@@ -4,6 +4,7 @@ using Microsoft.OpenApi.Models;
 using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
 using RegistryAPI.Data;
 using System.Reflection;
+using Microsoft.AspNetCore.Http.Features;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,6 +25,14 @@ builder.Services.AddRazorPages(options =>
     options.Conventions.AllowAnonymousToPage("/Index");
 })
 .AddRazorRuntimeCompilation();
+
+// Increase default multipart body length limit (Kestrel/Form)
+// Adjust this value to match the desired maximum upload size (bytes).
+var maxUploadBytes = 1024L * 1024L * 1024L; // 1 GB
+builder.Services.Configure<FormOptions>(options =>
+{
+    options.MultipartBodyLengthLimit = maxUploadBytes; // multipart body
+});
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
@@ -84,7 +93,14 @@ builder.Services.AddAntiforgery();
 
 builder.Services.AddHttpClient();
 
+// Sequence service for atomic sequence allocation
+builder.Services.AddScoped<RegistryAPI.Services.SequenceService>();
+
 var app = builder.Build();
+
+// Adjust Kestrel limits if using Kestrel directly (optional)
+var kestrelLimits = app.Services.GetRequiredService<Microsoft.Extensions.Options.IOptions<Microsoft.AspNetCore.Server.Kestrel.Core.KestrelServerOptions>>();
+// Note: setting Kestrel limits via IOptions at runtime may not apply; if hosting with Kestrel, configure limits in Program.cs before Build() or in configuration.
 
 // Configure the HTTP request pipeline
 if (app.Environment.IsDevelopment())

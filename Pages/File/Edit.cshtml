@@ -1,0 +1,115 @@
+@page "{id:int}"
+@model RegistryAPI.Pages.File.EditModel
+@{
+    ViewData["Title"] = "Edit File";
+
+    var userName = User.Identity?.Name;
+    var firstName = "User";
+
+    if (!string.IsNullOrEmpty(userName) && userName.Contains('@'))
+    {
+        firstName = userName.Split('@')[0];
+        firstName = System.Globalization.CultureInfo.CurrentCulture.TextInfo
+        .ToTitleCase(firstName.ToLower());
+    }
+    else if (!string.IsNullOrEmpty(userName))
+    {
+        firstName = userName;
+    }
+}
+
+<div class="container-fluid px-4">
+
+    <!-- Header -->
+    <div class="row align-items-center mb-4 pt-3">
+        <div class="col-md-8">
+            <div class="d-flex align-items-center">
+                <div class="me-3">
+                    <div class="ministry-badge">
+                        <i class="fas fa-folder"></i>
+                    </div>
+                </div>
+                <div>
+                    <h1 class="h3 fw-bold mb-1 text-uganda-primary">
+                        Edit File
+                    </h1>
+                    <p class="text-muted mb-0">
+                        Ministry of Works and Transport - File Registry
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FULL WIDTH FORM -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-0 py-3">
+                    <h5 class="mb-0 fw-bold">
+                        <i class="fas fa-edit text-uganda-primary me-2"></i>
+                        File Information
+                    </h5>
+                </div>
+
+                <div class="card-body">
+                    <form method="post">
+
+                        <input type="hidden" asp-for="FileItem.FileId" />
+
+                        <div class="row g-4">
+                            <!-- Staff ID -->
+                            <div class="col-md-6">
+                                <label class="form-label fw-medium">Assigned Staff ID (Optional)</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">
+                                        <i class="fas fa-user"></i>
+                                    </span>
+                                    <input asp-for="FileItem.StaffId" class="form-control form-control-lg"
+                                        placeholder="Enter staff ID" />
+                                </div>
+                                <span asp-validation-for="FileItem.StaffId" class="text-danger small"></span>
+                            </div>
+
+                            <!-- File Status -->
+                            <div class="col-md-6">
+                                <label class="form-label fw-medium">File Status</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">
+                                        <i class="fas fa-info-circle"></i>
+                                    </span>
+                                    <select asp-for="FileItem.FileStatus" class="form-select form-select-lg">
+                                        <option value="Open">Open</option>
+                                        <option value="Active">Active</option>
+                                        <option value="Closed">Closed</option>
+                                        <option value="Archived">Archived</option>
+                                    </select>
+                                </div>
+                                <span asp-validation-for="FileItem.FileStatus" class="text-danger small"></span>
+                            </div>
+                        </div>
+
+                        <!-- Actions -->
+                        <div class="d-flex gap-3 mt-4 pt-4 border-top">
+                            <button type="submit" class="btn btn-uganda-primary btn-lg px-5">
+                                <i class="fas fa-save me-2"></i>Save Changes
+                            </button>
+
+                            <a asp-page="Index" class="btn btn-outline-secondary btn-lg px-5">
+                                <i class="fas fa-times me-2"></i>Cancel
+                            </a>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- Styles moved to ~/css/pages.css (consolidated) -->
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

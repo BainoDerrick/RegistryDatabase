@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using RegistryAPI.Data;
 
@@ -18,6 +19,8 @@ namespace RegistryAPI.Migrations
             modelBuilder
                 .HasAnnotation("ProductVersion", "9.0.7")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
+
+            MySqlModelBuilderExtensions.AutoIncrementColumns(modelBuilder);
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
                 {
@@ -50,6 +53,8 @@ namespace RegistryAPI.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("ClaimType")
                         .HasColumnType("longtext");
@@ -91,7 +96,7 @@ namespace RegistryAPI.Migrations
                         .HasColumnType("tinyint(1)");
 
                     b.Property<DateTimeOffset?>("LockoutEnd")
-                        .HasColumnType("datetime");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("NormalizedEmail")
                         .HasMaxLength(256)
@@ -137,6 +142,8 @@ namespace RegistryAPI.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("ClaimType")
                         .HasColumnType("longtext");
@@ -258,6 +265,8 @@ namespace RegistryAPI.Migrations
                         .HasColumnType("int")
                         .HasColumnName("document_id");
 
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("DocumentId"));
+
                     b.Property<DateTime?>("CreateDate")
                         .HasColumnType("datetime(6)")
                         .HasColumnName("create_date");
@@ -318,6 +327,8 @@ namespace RegistryAPI.Migrations
                         .HasColumnType("int")
                         .HasColumnName("doc_type_id");
 
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("DocTypeId"));
+
                     b.Property<DateTime?>("CreateDate")
                         .HasColumnType("datetime(6)")
                         .HasColumnName("create_date");
@@ -353,6 +364,8 @@ namespace RegistryAPI.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasColumnName("file_id");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("FileId"));
 
                     b.Property<DateTime?>("CreateDate")
                         .HasColumnType("datetime(6)")
@@ -503,6 +516,8 @@ namespace RegistryAPI.Migrations
                         .HasColumnType("int")
                         .HasColumnName("termination_id");
 
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("TerminationId"));
+
                     b.Property<DateTime?>("CreateDate")
                         .HasColumnType("datetime(6)")
                         .HasColumnName("create_date");
@@ -541,6 +556,8 @@ namespace RegistryAPI.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasColumnName("transaction_id");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("TransactionId"));
 
                     b.Property<string>("CreatedBy")
                         .IsRequired()

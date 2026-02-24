@@ -6206,11 +6206,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\DERRICK\\Desktop\\RegistryAPI\\RegistryAPI.csproj",
+      "projectUniqueName": "C:\\Users\\DERRICK\\Desktop\\ministry\\RegistryDatabase\\RegistryAPI.csproj",
       "projectName": "RegistryAPI",
-      "projectPath": "C:\\Users\\DERRICK\\Desktop\\RegistryAPI\\RegistryAPI.csproj",
+      "projectPath": "C:\\Users\\DERRICK\\Desktop\\ministry\\RegistryDatabase\\RegistryAPI.csproj",
       "packagesPath": "C:\\Users\\DERRICK\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\DERRICK\\Desktop\\RegistryAPI\\obj\\",
+      "outputPath": "C:\\Users\\DERRICK\\Desktop\\ministry\\RegistryDatabase\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\DERRICK\\AppData\\Roaming\\NuGet\\NuGet.Config"

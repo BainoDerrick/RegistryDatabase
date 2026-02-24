@@ -41,5 +41,13 @@ namespace RegistryAPI.Models
 
         public Staff? Staff { get; set; }
         public File? File { get; set; }
+        [Column("sequence_number")]
+        public int? SequenceNumber { get; set; }
+
+        [Column("sequence_id")]
+        public string? SequenceId { get; set; }
+
+        [Column("display_number")]
+        public string? DisplayNumber { get; set; }
     }
 }

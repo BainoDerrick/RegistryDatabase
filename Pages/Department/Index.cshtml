@@ -1,0 +1,511 @@
+@page
+@model RegistryAPI.Pages.Department.IndexModel
+@{
+    ViewData["Title"] = "Manage Departments";
+
+    // Extract first name from email for avatar
+    var userName = User.Identity?.Name;
+    var firstName = "User";
+
+    if (!string.IsNullOrEmpty(userName) && userName.Contains('@'))
+    {
+        firstName = userName.Split('@')[0];
+        firstName = System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(firstName.ToLower());
+    }
+    else if (!string.IsNullOrEmpty(userName))
+    {
+        firstName = userName;
+    }
+}
+
+<div class="container-fluid px-4">
+    <!-- Header -->
+    <div class="row align-items-center mb-4 pt-3">
+        <div class="col-md-8">
+            <div class="d-flex align-items-center">
+                <div class="me-3">
+                    <div class="ministry-badge">
+                        <i class="fas fa-building"></i>
+                    </div>
+                </div>
+                <div>
+                    <h1 class="h3 fw-bold mb-1 text-uganda-primary">Department Management</h1>
+                    <p class="text-muted mb-0">Ministry of Works and Transport - Department Registry System</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="row g-4 mb-4">
+        <div class="col-xl-3 col-md-6">
+            <div class="card stats-card bg-white border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h6 class="text-uppercase text-muted mb-2">Total Departments</h6>
+                            <h2 class="mb-0 fw-bold text-uganda-black">@Model.DepartmentList.Count()</h2>
+                            <p class="text-muted mb-0">All departments</p>
+                        </div>
+                        <div class="icon-circle bg-uganda-primary-light">
+                            <i class="fas fa-building text-uganda-primary"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6">
+            <div class="card stats-card bg-white border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h6 class="text-uppercase text-muted mb-2">Active</h6>
+                            <h2 class="mb-0 fw-bold text-success">@Model.DepartmentList.Count()</h2>
+                            <p class="text-muted mb-0">Active departments</p>
+                        </div>
+                        <div class="icon-circle bg-success-light">
+                            <i class="fas fa-check-circle text-success"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6">
+            <div class="card stats-card bg-white border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h6 class="text-uppercase text-muted mb-2">Recently Added</h6>
+                            <h2 class="mb-0 fw-bold text-info">0</h2>
+                            <p class="text-muted mb-0">Last 30 days</p>
+                        </div>
+                        <div class="icon-circle bg-info-light">
+                            <i class="fas fa-clock text-info"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6">
+            <div class="card stats-card bg-white border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h6 class="text-uppercase text-muted mb-2">Staff Capacity</h6>
+                            <h2 class="mb-0 fw-bold text-warning">@Model.TotalStaffAssigned</h2>
+                            <p class="text-muted mb-0">Total staff assigned</p>
+                        </div>
+                        <div class="icon-circle bg-warning-light">
+                            <i class="fas fa-users text-warning"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Actions Bar -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 class="mb-0 fw-bold">Department Registry</h5>
+                            <p class="text-muted mb-0 small">Manage all departments in the ministry</p>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <a class="btn btn-uganda-primary d-flex align-items-center" asp-page="Create">
+                                <i class="fas fa-plus-circle me-2"></i>Create New Department
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Search and Filters -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <form method="get" class="row g-3">
+                        <div class="col-lg-8">
+                            <div class="input-group input-group-lg">
+                                <span class="input-group-text bg-uganda-primary-light text-uganda-primary">
+                                    <i class="fas fa-search"></i>
+                                </span>
+                                <input type="search" name="search" value="@Model.Search" class="form-control"
+                                    placeholder="Search departments (ID, code, name)" />
+                                <button class="btn btn-uganda-primary" type="submit">
+                                    <i class="fas fa-search me-1"></i>Search
+                                </button>
+                                @if (!string.IsNullOrEmpty(Model.Search))
+                                {
+                                    <a class="btn btn-outline-secondary" href="?">
+                                        <i class="fas fa-times me-1"></i>Clear
+                                    </a>
+                                }
+                            </div>
+                        </div>
+                        <div class="col-lg-4 d-flex align-items-center justify-content-end">
+                            <!-- space for actions or filters if needed -->
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Departments Table -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="bg-light">
+                                <tr>
+                                    <th class="fw-medium text-uganda-primary">Department ID</th>
+                                    <th class="fw-medium text-uganda-primary">Code</th>
+                                    <th class="fw-medium text-uganda-primary">Name</th>
+                                    <th class="fw-medium text-uganda-primary text-end pe-4">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model.DepartmentList)
+                                {
+                                    <tr class="department-row">
+
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <div class="department-icon me-2">
+                                                    <i class="fas fa-building text-uganda-primary"></i>
+                                                </div>
+                                                <div>
+                                                    <div class="fw-bold">@item.DeptId</div>
+                                                    <small class="text-muted">ID</small>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-uganda-primary-light text-uganda-primary px-3 py-2">
+                                                @item.DeptCode
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <div class="fw-medium">@item.DeptName</div>
+                                            <small class="text-muted">Ministry Department</small>
+                                        </td>
+
+                                        <td class="text-end pe-4">
+                                            <div class="btn-group" role="group">
+                                                <a asp-page="Details" asp-route-id="@item.DeptId"
+                                                    class="btn btn-sm btn-outline-info" data-bs-toggle="tooltip"
+                                                    title="View Details">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                                <a asp-page="Edit" asp-route-id="@item.DeptId"
+                                                    class="btn btn-sm btn-outline-warning" data-bs-toggle="tooltip"
+                                                    title="Edit Department">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                                <a asp-page="Delete" asp-route-id="@item.DeptId"
+                                                    class="btn btn-sm btn-outline-danger" data-bs-toggle="tooltip"
+                                                    title="Delete Department">
+                                                    <i class="fas fa-trash-alt"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+
+                                @if (!Model.DepartmentList.Any())
+                                {
+                                    <tr>
+                                        <td colspan="4" class="text-center py-5">
+                                            <div class="py-4">
+                                                <i class="fas fa-building fa-3x text-muted mb-3"></i>
+                                                <h5 class="text-muted">No departments found</h5>
+                                                <p class="text-muted mb-4">@(string.IsNullOrEmpty(Model.Search) ? "Create                                                your first department to get started." : "No departments match your                                               search criteria.")</p>
+                                                <a class="btn btn-uganda-primary" asp-page="Create">
+                                                    <i class="fas fa-plus-circle me-2"></i>Create First Department
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Table Footer -->
+                @if (Model.DepartmentList.Any())
+                {
+                    <div class="card-footer bg-white border-0 py-3">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="text-muted">
+                                Showing <strong>@Model.DepartmentList.Count()</strong> departments
+                                @if (!string.IsNullOrEmpty(Model.Search))
+                                {
+                                    <span>matching "<strong>@Model.Search</strong>"</span>
+                                }
+                            </div>
+                            <div class="text-end">
+                                <!-- actions removed: no bulk operations -->
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<style>
+    /* Ministry Colors */
+    :root {
+        --uganda-black: #000000;
+        --uganda-yellow: #FFD100;
+        --uganda-red: #D90000;
+        --uganda-primary: #0066cc;
+        --uganda-primary-light: rgba(0, 102, 204, 0.1);
+        --success-light: rgba(25, 135, 84, 0.1);
+        --info-light: rgba(13, 202, 240, 0.1);
+        --warning-light: rgba(255, 193, 7, 0.1);
+        --danger-light: rgba(220, 53, 69, 0.1);
+    }
+
+    .text-uganda-primary {
+        color: var(--uganda-primary) !important;
+    }
+
+    .text-uganda-yellow {
+        color: var(--uganda-yellow) !important;
+    }
+
+    .text-uganda-red {
+        color: var(--uganda-red) !important;
+    }
+
+    .text-uganda-black {
+        color: var(--uganda-black) !important;
+    }
+
+    .bg-uganda-primary {
+        background-color: var(--uganda-primary) !important;
+    }
+
+    .bg-uganda-yellow {
+        background-color: var(--uganda-yellow) !important;
+    }
+
+    .bg-uganda-red {
+        background-color: var(--uganda-red) !important;
+    }
+
+    .bg-uganda-primary-light {
+        background-color: var(--uganda-primary-light) !important;
+    }
+
+    .bg-success-light {
+        background-color: var(--success-light) !important;
+    }
+
+    .bg-info-light {
+        background-color: var(--info-light) !important;
+    }
+
+    .bg-warning-light {
+        background-color: var(--warning-light) !important;
+    }
+
+    .bg-danger-light {
+        background-color: var(--danger-light) !important;
+    }
+
+    /* Ministry Badge */
+    .ministry-badge {
+        width: 50px;
+        height: 50px;
+        background: linear-gradient(135deg, var(--uganda-primary) 0%, #004080 100%);
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 24px;
+    }
+
+    /* User Avatar */
+    .user-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        color: var(--uganda-black);
+    }
+
+    /* Button Styling */
+    .btn-outline-uganda {
+        color: var(--uganda-primary);
+        border-color: var(--uganda-primary);
+    }
+
+    .btn-outline-uganda:hover {
+        background-color: var(--uganda-primary);
+        color: white;
+    }
+
+    .btn-uganda-primary {
+        background-color: var(--uganda-primary);
+        border-color: var(--uganda-primary);
+        color: white;
+        font-weight: 500;
+    }
+
+    .btn-uganda-primary:hover {
+        background-color: #0052a3;
+        border-color: #0052a3;
+        color: white;
+    }
+
+    /* Stats Cards */
+    .stats-card {
+        border-radius: 12px;
+        transition: all 0.3s ease;
+        border-left: 4px solid var(--uganda-primary);
+    }
+
+    .stats-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1) !important;
+    }
+
+    .icon-circle {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+    }
+
+    /* Table Styling */
+    .table {
+        margin-bottom: 0;
+    }
+
+    .table-hover tbody tr:hover {
+        background-color: rgba(0, 102, 204, 0.03);
+        transform: translateX(2px);
+        transition: all 0.2s ease;
+    }
+
+    .table thead th {
+        border-bottom: 2px solid var(--uganda-primary);
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.875rem;
+        letter-spacing: 0.5px;
+    }
+
+    .table tbody td {
+        vertical-align: middle;
+        padding: 1.25rem 0.75rem;
+        border-top: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    /* Department Row */
+    .department-row {
+        cursor: pointer;
+    }
+
+    .department-icon {
+        width: 36px;
+        height: 36px;
+        background: var(--uganda-primary-light);
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    /* Badges */
+    .badge {
+        font-weight: 500;
+        letter-spacing: 0.3px;
+    }
+
+    /* Form Controls */
+    .form-check-input:checked {
+        background-color: var(--uganda-primary);
+        border-color: var(--uganda-primary);
+    }
+
+    .form-check-input:focus {
+        border-color: var(--uganda-primary);
+        box-shadow: 0 0 0 0.25rem rgba(0, 102, 204, 0.25);
+    }
+
+    .input-group-lg .form-control,
+    .input-group-lg .btn {
+        height: calc(3rem + 2px);
+    }
+
+    /* Action Buttons */
+    .btn-group .btn {
+        border-radius: 6px !important;
+        margin: 0 2px;
+    }
+
+    .btn-group .btn:first-child {
+        border-top-right-radius: 0 !important;
+        border-bottom-right-radius: 0 !important;
+    }
+
+    .btn-group .btn:last-child {
+        border-top-left-radius: 0 !important;
+        border-bottom-left-radius: 0 !important;
+    }
+
+    /* Empty State */
+    .fa-3x {
+        opacity: 0.5;
+    }
+
+    /* Responsive */
+    @@media (max-width: 768px) {
+        .ministry-badge {
+            width: 40px;
+            height: 40px;
+            font-size: 20px;
+        }
+
+        .table-responsive {
+            font-size: 0.875rem;
+        }
+
+        .btn-group .btn {
+            padding: 0.25rem 0.5rem;
+        }
+
+        .icon-circle {
+            width: 40px;
+            height: 40px;
+            font-size: 18px;
+        }
+    }
+</style>
+<!-- Department styles and scripts moved to wwwroot/css/pages.css and wwwroot/js/pages.js -->

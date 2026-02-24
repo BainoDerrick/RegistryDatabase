@@ -1,0 +1,405 @@
+@page
+@model RegistryAPI.Pages.Document.IndexModel
+@{
+    ViewData["Title"] = "Manage Documents";
+
+    // Extract first name from email (consistent with other pages)
+    var userName = User.Identity?.Name;
+    var firstName = "User";
+
+    if (!string.IsNullOrEmpty(userName) && userName.Contains('@'))
+    {
+        firstName = userName.Split('@')[0];
+        firstName = System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(firstName.ToLower());
+    }
+    else if (!string.IsNullOrEmpty(userName))
+    {
+        firstName = userName;
+    }
+}
+
+<div class="container-fluid px-4">
+    <!-- Header -->
+    <div class="row align-items-center mb-4 pt-3">
+        <div class="col-md-8">
+            <div class="d-flex align-items-center">
+                <div class="me-3">
+                    <div class="ministry-badge">
+                        <i class="fas fa-file-alt"></i>
+                    </div>
+                </div>
+                <div>
+                    <h1 class="h3 fw-bold mb-1 text-uganda-primary">Document Management</h1>
+                    <p class="text-muted mb-0">Ministry of Works and Transport - Document Registry System</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="row g-4 mb-4">
+        <div class="col-xl-3 col-md-6">
+            <div class="card stats-card bg-white border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h6 class="text-uppercase text-muted mb-2">Total Documents</h6>
+                            <h2 class="mb-0 fw-bold text-uganda-black">@Model.Documents.Count()</h2>
+                            <p class="text-muted mb-0">All registered documents</p>
+                        </div>
+                        <div class="icon-circle bg-uganda-primary-light">
+                            <i class="fas fa-file-alt text-uganda-primary"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6">
+            <div class="card stats-card bg-white border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h6 class="text-uppercase text-muted mb-2">With Files</h6>
+                            <h2 class="mb-0 fw-bold text-success">@Model.Documents.Count(d => d.FileId.HasValue)</h2>
+                            <p class="text-muted mb-0">Documents with attached files</p>
+                        </div>
+                        <div class="icon-circle bg-success-light">
+                            <i class="fas fa-paperclip text-success"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6">
+            <div class="card stats-card bg-white border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h6 class="text-uppercase text-muted mb-2">Recently Added</h6>
+                            <h2 class="mb-0 fw-bold text-info">0</h2>
+                            <p class="text-muted mb-0">Last 30 days</p>
+                        </div>
+                        <div class="icon-circle bg-info-light">
+                            <i class="fas fa-clock text-info"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6">
+            <div class="card stats-card bg-white border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h6 class="text-uppercase text-muted mb-2">Total Types</h6>
+                            <h2 class="mb-0 fw-bold text-warning">@Model.Documents.Select(d =>
+                                                                d.DocTypeId).Distinct().Count()</h2>
+                            <p class="text-muted mb-0">Unique document types</p>
+                        </div>
+                        <div class="icon-circle bg-warning-light">
+                            <i class="fas fa-tags text-warning"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Actions Bar -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 class="mb-0 fw-bold">Document Registry</h5>
+                            <p class="text-muted mb-0 small">Manage all ministry documents and attached files</p>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <a class="btn btn-uganda-primary d-flex align-items-center" asp-page="Create">
+                                <i class="fas fa-plus-circle me-2"></i>Create New Document
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Search -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <form method="get" class="row g-3">
+                        <div class="col-lg-8">
+                            <div class="input-group input-group-lg">
+                                <span class="input-group-text bg-uganda-primary-light text-uganda-primary">
+                                    <i class="fas fa-search"></i>
+                                </span>
+                                <input type="search" name="search" value="@Model.Search" class="form-control"
+                                    placeholder="Search documents (name, type, file ID...)" />
+                                <button class="btn btn-uganda-primary" type="submit">
+                                    <i class="fas fa-search me-1"></i>Search
+                                </button>
+                                @if (!string.IsNullOrEmpty(Model.Search))
+                                {
+                                    <a class="btn btn-outline-secondary" href="?">
+                                        <i class="fas fa-times me-1"></i>Clear
+                                    </a>
+                                }
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Documents Table -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="bg-light">
+                                <tr>
+                                    <th class="fw-medium text-uganda-primary">Document ID</th>
+                                    <th class="fw-medium text-uganda-primary">Name</th>
+                                    <th class="fw-medium text-uganda-primary">Attached File</th>
+                                    <th class="fw-medium text-uganda-primary">Type</th>
+                                    <th class="fw-medium text-uganda-primary">Date</th>
+                                    <th class="fw-medium text-uganda-primary text-end pe-4">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model.Documents)
+                                {
+                                    <tr class="document-row">
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <div class="document-icon me-2">
+                                                    <i class="fas fa-file-alt text-uganda-primary"></i>
+                                                </div>
+                                                <div>
+                                                    <div class="fw-bold">@item.DocumentId</div>
+                                                    <small class="text-muted">ID</small>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="fw-medium">@item.DocumentName</div>
+                                            <small class="text-muted">Document</small>
+                                        </td>
+                                        <td>
+                                            @if (item.FileId.HasValue)
+                                            {
+                                                <span class="badge bg-success-light text-success px-3 py-2">
+                                                    <i class="fas fa-check me-1"></i>File #@item.FileId.Value
+                                                </span>
+                                            }
+                                            else
+                                            {
+                                                <span class="text-muted">— No file —</span>
+                                            }
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-uganda-primary-light text-uganda-primary px-3 py-2">
+                                                @(item.DocumentType?.TypeName ?? (item.DocTypeId.HasValue ? $"ID                                            {item.DocTypeId}" : "—"))
+                                            </span>
+                                        </td>
+                                        <td>
+                                            @(item.DocumentDate.HasValue
+                                                                                    ? item.DocumentDate.Value.ToString("dd MMM yyyy")
+                                                                                    : "<span class='text-muted'>—</span>")
+                                        </td>
+                                        <td class="text-end pe-4">
+                                            <div class="btn-group" role="group">
+                                                <a asp-page="Details" asp-route-id="@item.DocumentId"
+                                                    class="btn btn-sm btn-outline-info" data-bs-toggle="tooltip"
+                                                    title="View Details">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                                <a asp-page="Edit" asp-route-id="@item.DocumentId"
+                                                    class="btn btn-sm btn-outline-warning" data-bs-toggle="tooltip"
+                                                    title="Edit Document">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                                <a asp-page="Delete" asp-route-id="@item.DocumentId"
+                                                    class="btn btn-sm btn-outline-danger" data-bs-toggle="tooltip"
+                                                    title="Delete Document">
+                                                    <i class="fas fa-trash-alt"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+
+                                @if (!Model.Documents.Any())
+                                {
+                                    <tr>
+                                        <td colspan="6" class="text-center py-5">
+                                            <div class="py-4">
+                                                <i class="fas fa-file-alt fa-3x text-muted mb-3"></i>
+                                                <h5 class="text-muted">No documents found</h5>
+                                                <p class="text-muted mb-4">
+                                                    @(string.IsNullOrEmpty(Model.Search)
+                                                                                                    ? "Create your first document to get started."
+                                                                                                    : "No documents match your search criteria.")
+                                                </p>
+                                                <a class="btn btn-uganda-primary" asp-page="Create">
+                                                    <i class="fas fa-plus-circle me-2"></i>Create First Document
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Table Footer -->
+                @if (Model.Documents.Any())
+                {
+                    <div class="card-footer bg-white border-0 py-3">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="text-muted">
+                                Showing <strong>@Model.Documents.Count()</strong> document(s)
+                                @if (!string.IsNullOrEmpty(Model.Search))
+                                {
+                                    <span>matching "<strong>@Model.Search</strong>"</span>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    :root {
+        --uganda-primary: #0066cc;
+        --uganda-primary-light: rgba(0, 102, 204, 0.1);
+        --uganda-yellow: #FFD100;
+        --success-light: rgba(25, 135, 84, 0.1);
+        --info-light: rgba(13, 202, 240, 0.1);
+        --warning-light: rgba(255, 193, 7, 0.1);
+    }
+
+    .text-uganda-primary {
+        color: var(--uganda-primary) !important;
+    }
+
+    .bg-uganda-primary-light {
+        background-color: var(--uganda-primary-light) !important;
+    }
+
+    .bg-success-light {
+        background-color: var(--success-light) !important;
+    }
+
+    .bg-info-light {
+        background-color: var(--info-light) !important;
+    }
+
+    .bg-warning-light {
+        background-color: var(--warning-light) !important;
+    }
+
+    .ministry-badge {
+        width: 50px;
+        height: 50px;
+        background: linear-gradient(135deg, var(--uganda-primary) 0%, #004080 100%);
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 24px;
+    }
+
+    .btn-uganda-primary {
+        background-color: var(--uganda-primary);
+        border-color: var(--uganda-primary);
+        color: white;
+        font-weight: 500;
+    }
+
+    .btn-uganda-primary:hover {
+        background-color: #0052a3;
+        border-color: #0052a3;
+        color: white;
+    }
+
+    .stats-card {
+        border-radius: 12px;
+        transition: all 0.3s ease;
+        border-left: 4px solid var(--uganda-primary);
+    }
+
+    .stats-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1) !important;
+    }
+
+    .icon-circle {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+    }
+
+    .table-hover tbody tr:hover {
+        background-color: rgba(0, 102, 204, 0.03);
+    }
+
+    .table thead th {
+        border-bottom: 2px solid var(--uganda-primary);
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.875rem;
+        letter-spacing: 0.5px;
+    }
+
+    .table tbody td {
+        vertical-align: middle;
+        padding: 1.25rem 0.75rem;
+    }
+
+    .document-icon {
+        width: 36px;
+        height: 36px;
+        background: var(--uganda-primary-light);
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .badge {
+        font-weight: 500;
+    }
+
+    .input-group-lg .form-control,
+    .input-group-lg .btn {
+        height: calc(3rem + 2px);
+    }
+
+    .btn-group .btn {
+        border-radius: 6px !important;
+        margin: 0 2px;
+    }
+
+    /* Responsive breakpoint styles moved to consolidated CSS */
+
+    < !-- Styles moved to~/css/pages.css (consolidated) -->< !-- Inline scripts moved to~/js/pages.js (consolidated) -->

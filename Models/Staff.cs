@@ -8,8 +8,7 @@ namespace RegistryAPI.Models
     public class Staff
     {
         [Column("staff_id")]
-        [Required]
-        public string StaffId { get; set; }
+        public string StaffId { get; set; } = string.Empty;
 
         [Column("first_name")]
         public string? FirstName { get; set; }
@@ -50,13 +49,12 @@ namespace RegistryAPI.Models
         [Column("update_date")]
         public DateTime? UpdateDate { get; set; }
 
-        [Column("password")] // Already added
-        [Required]
-        public string Password { get; set; }
+        [Column("password")] // Optional password for registry workers
+        public string? Password { get; set; }
 
         [Column("role")] // Added for the new column
         [Required] // Since it's NOT NULL in the database
-        public string Role { get; set; } // Default to null for now, will be set via API
+        public string Role { get; set; } = string.Empty; // Default empty, will be set via API
 
         // Navigation properties
         public Department? Department { get; set; }

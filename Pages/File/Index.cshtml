@@ -1,0 +1,276 @@
+@page
+@model RegistryAPI.Pages.File.IndexModel
+@{
+    ViewData["Title"] = "Manage Files";
+
+    var userName = User.Identity?.Name;
+    var firstName = "User";
+
+    if (!string.IsNullOrEmpty(userName) && userName.Contains('@'))
+    {
+        firstName = userName.Split('@')[0];
+        firstName = System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(firstName.ToLower());
+    }
+    else if (!string.IsNullOrEmpty(userName))
+    {
+        firstName = userName;
+    }
+}
+
+<div class="container-fluid px-4">
+    <!-- Header -->
+    <div class="row align-items-center mb-4 pt-3">
+        <div class="col-md-8">
+            <div class="d-flex align-items-center">
+                <div class="me-3">
+                    <div class="ministry-badge">
+                        <i class="fas fa-folder-open"></i>
+                    </div>
+                </div>
+                <div>
+                    <h1 class="h3 fw-bold mb-1 text-uganda-primary">File Management</h1>
+                    <p class="text-muted mb-0">Ministry of Works and Transport - File Registry System</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="row g-4 mb-4">
+        <div class="col-xl-3 col-md-6">
+            <div class="card stats-card bg-white border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h6 class="text-uppercase text-muted mb-2">Total Files</h6>
+                            <h2 class="mb-0 fw-bold text-uganda-black">@Model.Files.Count()</h2>
+                            <p class="text-muted mb-0">All registered files</p>
+                        </div>
+                        <div class="icon-circle bg-uganda-primary-light">
+                            <i class="fas fa-folder-open text-uganda-primary"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6">
+            <div class="card stats-card bg-white border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h6 class="text-uppercase text-muted mb-2">Active/Open</h6>
+                            <h2 class="mb-0 fw-bold text-success">@Model.Files.Count(f => f.FileStatus == "Active" ||
+                                                                f.FileStatus == "Open")</h2>
+                            <p class="text-muted mb-0">Currently in use</p>
+                        </div>
+                        <div class="icon-circle bg-success-light">
+                            <i class="fas fa-folder text-success"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6">
+            <div class="card stats-card bg-white border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h6 class="text-uppercase text-muted mb-2">Assigned to Staff</h6>
+                            <h2 class="mb-0 fw-bold text-info">@Model.Files.Count(f => !string.IsNullOrEmpty(f.StaffId))
+                            </h2>
+                            <p class="text-muted mb-0">With staff assignment</p>
+                        </div>
+                        <div class="icon-circle bg-info-light">
+                            <i class="fas fa-user text-info"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6">
+            <div class="card stats-card bg-white border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h6 class="text-uppercase text-muted mb-2">Closed/Archived</h6>
+                            <h2 class="mb-0 fw-bold text-warning">@Model.Files.Count(f => f.FileStatus == "Closed" ||
+                                                                f.FileStatus == "Archived")</h2>
+                            <p class="text-muted mb-0">No longer active</p>
+                        </div>
+                        <div class="icon-circle bg-warning-light">
+                            <i class="fas fa-archive text-warning"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Actions Bar -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 class="mb-0 fw-bold">File Registry</h5>
+                            <p class="text-muted mb-0 small">Manage physical and digital file records</p>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <a class="btn btn-uganda-primary d-flex align-items-center" asp-page="Create">
+                                <i class="fas fa-plus-circle me-2"></i>Create New File
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Search -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <form method="get" class="row g-3">
+                        <div class="col-lg-8">
+                            <div class="input-group input-group-lg">
+                                <span class="input-group-text bg-uganda-primary-light text-uganda-primary">
+                                    <i class="fas fa-search"></i>
+                                </span>
+                                <input type="search" name="search" value="@Model.Search" class="form-control"
+                                    placeholder="Search files (ID, staff, status)..." />
+                                <button class="btn btn-uganda-primary" type="submit">
+                                    <i class="fas fa-search me-1"></i>Search
+                                </button>
+                                @if (!string.IsNullOrEmpty(Model.Search))
+                                {
+                                    <a class="btn btn-outline-secondary" href="?">
+                                        <i class="fas fa-times me-1"></i>Clear
+                                    </a>
+                                }
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Files Table -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="bg-light">
+                                <tr>
+                                    <th class="fw-medium text-uganda-primary">File ID</th>
+                                    <th class="fw-medium text-uganda-primary">Assigned Staff</th>
+                                    <th class="fw-medium text-uganda-primary">Status</th>
+                                    <th class="fw-medium text-uganda-primary text-end pe-4">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model.Files)
+                                {
+                                    <tr class="file-row">
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <div class="file-icon me-2">
+                                                    <i class="fas fa-folder text-uganda-primary"></i>
+                                                </div>
+                                                <div>
+                                                    <div class="fw-bold">@item.FileId</div>
+                                                    <small class="text-muted">ID</small>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            @if (!string.IsNullOrEmpty(item.StaffId))
+                                            {
+                                                <span class="fw-medium">@item.StaffId</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="text-muted">— Unassigned —</span>
+                                            }
+                                        </td>
+                                        <td>
+                                            <span class="badge px-3 py-2 
+                                                    @(item.FileStatus == "Open" || item.FileStatus == "Active" ? "bg-success-light text-success" :
+                                                                                                    item.FileStatus == "Closed" ? "bg-warning-light text-warning" : 
+                                                                                                    "bg-secondary text-white")">
+                                                @item.FileStatus
+                                            </span>
+                                        </td>
+                                        <td class="text-end pe-4">
+                                            <div class="btn-group" role="group">
+                                                <a asp-page="Details" asp-route-id="@item.FileId"
+                                                    class="btn btn-sm btn-outline-info" data-bs-toggle="tooltip"
+                                                    title="View Details">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                                <a asp-page="Edit" asp-route-id="@item.FileId"
+                                                    class="btn btn-sm btn-outline-warning" data-bs-toggle="tooltip"
+                                                    title="Edit File">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                                <a asp-page="Delete" asp-route-id="@item.FileId"
+                                                    class="btn btn-sm btn-outline-danger" data-bs-toggle="tooltip"
+                                                    title="Delete File">
+                                                    <i class="fas fa-trash-alt"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+
+                                @if (!Model.Files.Any())
+                                {
+                                    <tr>
+                                        <td colspan="4" class="text-center py-5">
+                                            <div class="py-4">
+                                                <i class="fas fa-folder-open fa-3x text-muted mb-3"></i>
+                                                <h5 class="text-muted">No files found</h5>
+                                                <p class="text-muted mb-4">
+                                                    @(string.IsNullOrEmpty(Model.Search)
+                                                                                                    ? "Create your first file to get started."
+                                                                                                    : "No files match your search criteria.")
+                                                </p>
+                                                <a class="btn btn-uganda-primary" asp-page="Create">
+                                                    <i class="fas fa-plus-circle me-2"></i>Create First File
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Table Footer -->
+                @if (Model.Files.Any())
+                {
+                    <div class="card-footer bg-white border-0 py-3">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="text-muted">
+                                Showing <strong>@Model.Files.Count()</strong> file(s)
+                                @if (!string.IsNullOrEmpty(Model.Search))
+                                {
+                                    <span>matching "<strong>@Model.Search</strong>"</span>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Styles and scripts moved to wwwroot/css/pages.css and wwwroot/js/pages.js -->

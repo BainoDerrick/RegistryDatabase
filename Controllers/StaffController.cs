@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RegistryAPI.Data;
 using RegistryAPI.Models;
+using System.Linq;
 
 namespace RegistryAPI.Controllers
 {
@@ -16,14 +17,72 @@ namespace RegistryAPI.Controllers
             _context = context ?? throw new ArgumentNullException(nameof(context));
         }
 
+        // Helper to generate a new Staff ID. Uses deptCode as prefix when available.
+        private async Task<string> GenerateStaffIdAsync(string? deptCode)
+        {
+            var prefix = string.IsNullOrWhiteSpace(deptCode) ? "STF" : deptCode!.ToUpper().Replace(" ", "");
+
+            // Get existing IDs that start with the prefix
+            var ids = await _context.Staff
+                .Where(s => s.StaffId != null && s.StaffId.StartsWith(prefix))
+                .Select(s => s.StaffId)
+                .ToListAsync();
+
+            var max = 0;
+            foreach (var id in ids)
+            {
+                if (id == null) continue;
+                if (id.Length <= prefix.Length) continue;
+                var numericPart = new string(id.Skip(prefix.Length).Where(char.IsDigit).ToArray());
+                if (int.TryParse(numericPart, out var n))
+                {
+                    if (n > max) max = n;
+                }
+            }
+
+            var next = max + 1;
+            return $"{prefix}{next.ToString("D3")}";
+        }
+
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Staff>>> GetStaff([FromQuery] string? deptCode = null, [FromQuery] string? status = null)
+        public async Task<ActionResult<IEnumerable<Staff>>> GetStaff(
+            [FromQuery] string? search = null,
+            [FromQuery] string? firstName = null,
+            [FromQuery] string? lastName = null,
+            [FromQuery] string? email = null,
+            [FromQuery] string? deptCode = null,
+            [FromQuery] string? status = null,
+            [FromQuery] string? role = null)
         {
             try
             {
                 IQueryable<Staff> query = _context.Staff;
-                if (!string.IsNullOrEmpty(deptCode)) query = query.Where(s => s.DeptCode == deptCode);
-                if (!string.IsNullOrEmpty(status)) query = query.Where(s => s.Status == status);
+
+                if (!string.IsNullOrEmpty(search))
+                {
+                    var t = search.Trim().ToLower();
+                    query = query.Where(x => (x.StaffId != null && x.StaffId.ToLower().Contains(t))
+                                            || (x.FirstName != null && x.FirstName.ToLower().Contains(t))
+                                            || (x.LastName != null && x.LastName.ToLower().Contains(t))
+                                            || (x.Email != null && x.Email.ToLower().Contains(t))
+                                            || (x.DeptCode != null && x.DeptCode.ToLower().Contains(t))
+                                            || (x.Role != null && x.Role.ToLower().Contains(t))
+                                            || (x.Title != null && x.Title.ToLower().Contains(t)));
+                }
+
+                if (!string.IsNullOrEmpty(firstName)) { var t = firstName.Trim().ToLower(); query = query.Where(x => x.FirstName != null && x.FirstName.ToLower().Contains(t)); }
+                if (!string.IsNullOrEmpty(lastName)) { var t = lastName.Trim().ToLower(); query = query.Where(x => x.LastName != null && x.LastName.ToLower().Contains(t)); }
+                if (!string.IsNullOrEmpty(email)) { var t = email.Trim().ToLower(); query = query.Where(x => x.Email != null && x.Email.ToLower().Contains(t)); }
+                if (!string.IsNullOrEmpty(deptCode)) { var t = deptCode.Trim().ToLower(); query = query.Where(x => x.DeptCode != null && x.DeptCode.ToLower() == t); }
+                if (!string.IsNullOrEmpty(status)) { var t = status.Trim().ToLower(); query = query.Where(x => x.Status != null && x.Status.ToLower() == t); }
+
+                // Exclude terminated staff by default unless a status filter is provided
+                if (string.IsNullOrEmpty(status))
+                {
+                    query = query.Where(x => !((x.Status != null && x.Status.ToLower() == "terminated") || x.TerminationDate.HasValue));
+                }
+                if (!string.IsNullOrEmpty(role)) { var t = role.Trim().ToLower(); query = query.Where(x => x.Role != null && x.Role.ToLower() == t); }
+
                 return await query.ToListAsync();
             }
             catch (Exception ex)
@@ -57,17 +116,14 @@ namespace RegistryAPI.Controllers
                     return BadRequest(ModelState);
                 }
 
+                // Generate a StaffId if not provided. Staff IDs follow the pattern {PREFIX}{NNN}.
                 if (string.IsNullOrEmpty(staff.StaffId))
                 {
-                    ModelState.AddModelError("staffId", "Staff ID is required.");
-                    return BadRequest(ModelState);
+                    staff.StaffId = await GenerateStaffIdAsync(staff.DeptCode);
                 }
 
-                if (string.IsNullOrEmpty(staff.Password))
-                {
-                    ModelState.AddModelError("password", "Password is required.");
-                    return BadRequest(ModelState);
-                }
+                // Password is optional for registry workers; ensure not null to avoid DB NOT NULL issues
+                staff.Password ??= string.Empty;
 
                 if (string.IsNullOrEmpty(staff.Role))
                 {
@@ -122,12 +178,6 @@ namespace RegistryAPI.Controllers
                     Console.WriteLine("Error: Model state is invalid. Errors: " + string.Join(", ", ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage)));
                     return BadRequest(ModelState);
                 }
-                if (string.IsNullOrEmpty(staff.Password))
-                {
-                    ModelState.AddModelError("password", "Password is required.");
-                    Console.WriteLine("Error: Model state is invalid. Errors: " + string.Join(", ", ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage)));
-                    return BadRequest(ModelState);
-                }
                 if (string.IsNullOrEmpty(staff.Role))
                 {
                     ModelState.AddModelError("role", "Role is required.");
@@ -143,6 +193,12 @@ namespace RegistryAPI.Controllers
 
                 var existingStaff = await _context.Staff.FindAsync(id);
                 if (existingStaff == null) return NotFound($"Staff with ID {id} not found.");
+
+                // If the incoming payload doesn't include a password, preserve the existing one
+                if (string.IsNullOrEmpty(staff.Password))
+                {
+                    staff.Password = existingStaff.Password;
+                }
 
                 if (!string.IsNullOrEmpty(staff.DeptCode) && staff.DeptCode != existingStaff.DeptCode)
                 {
@@ -166,7 +222,7 @@ namespace RegistryAPI.Controllers
 
                 // Verify the change by querying back
                 var updatedStaff = await _context.Staff.FindAsync(id);
-                Console.WriteLine($"Verified update - FirstName: {updatedStaff.FirstName}, EmploymentType: {updatedStaff.EmploymentType}");
+                Console.WriteLine($"Verified update - FirstName: {updatedStaff?.FirstName}, EmploymentType: {updatedStaff?.EmploymentType}");
 
                 return NoContent();
             }

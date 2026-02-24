@@ -18,11 +18,27 @@ namespace RegistryAPI.Controllers
 
         // GET: api/department
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Department>>> GetDepartments()
+        public async Task<ActionResult<IEnumerable<Department>>> GetDepartments(
+            [FromQuery] string? search = null,
+            [FromQuery] string? deptId = null,
+            [FromQuery] string? deptCode = null,
+            [FromQuery] string? deptName = null)
         {
-            return await _context.Departments
-                .Include(d => d.StaffMembers)
-                .ToListAsync();
+            IQueryable<Department> query = _context.Departments.Include(d => d.StaffMembers);
+
+            if (!string.IsNullOrEmpty(search))
+            {
+                var t = search.Trim().ToLower();
+                query = query.Where(x => (x.DeptId != null && x.DeptId.ToLower().Contains(t))
+                                       || (x.DeptCode != null && x.DeptCode.ToLower().Contains(t))
+                                       || (x.DeptName != null && x.DeptName.ToLower().Contains(t)));
+            }
+
+            if (!string.IsNullOrEmpty(deptId)) { var t = deptId.Trim().ToLower(); query = query.Where(x => x.DeptId != null && x.DeptId.ToLower() == t); }
+            if (!string.IsNullOrEmpty(deptCode)) { var t = deptCode.Trim().ToLower(); query = query.Where(x => x.DeptCode != null && x.DeptCode.ToLower() == t); }
+            if (!string.IsNullOrEmpty(deptName)) { var t = deptName.Trim().ToLower(); query = query.Where(x => x.DeptName != null && x.DeptName.ToLower().Contains(t)); }
+
+            return await query.ToListAsync();
         }
 
         // GET: api/department/6

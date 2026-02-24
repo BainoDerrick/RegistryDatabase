@@ -1,0 +1,276 @@
+@page
+@model RegistryAPI.Pages.Staff.IndexModel
+@{
+    ViewData["Title"] = "Manage Staff";
+
+    var userName = User.Identity?.Name;
+    var firstName = "User";
+
+    if (!string.IsNullOrEmpty(userName) && userName.Contains('@'))
+    {
+        firstName = userName.Split('@')[0];
+        firstName = System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(firstName.ToLower());
+    }
+    else if (!string.IsNullOrEmpty(userName))
+    {
+        firstName = userName;
+    }
+}
+
+<div class="container-fluid px-4">
+    <!-- Header -->
+    <div class="row align-items-center mb-4 pt-3">
+        <div class="col-md-8">
+            <div class="d-flex align-items-center">
+                <div class="me-3">
+                    <div class="ministry-badge">
+                        <i class="fas fa-users"></i>
+                    </div>
+                </div>
+                <div>
+                    <h1 class="h3 fw-bold mb-1 text-uganda-primary">Staff Management</h1>
+                    <p class="text-muted mb-0">Ministry of Works and Transport - Staff Registry System</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="row g-4 mb-4">
+        <div class="col-xl-3 col-md-6">
+            <div class="card stats-card bg-white border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h6 class="text-uppercase text-muted mb-2">Total Staff</h6>
+                            <h2 class="mb-0 fw-bold text-uganda-black">@Model.StaffList.Count()</h2>
+                            <p class="text-muted mb-0">All registered staff members</p>
+                        </div>
+                        <div class="icon-circle bg-uganda-primary-light">
+                            <i class="fas fa-users text-uganda-primary"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6">
+            <div class="card stats-card bg-white border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h6 class="text-uppercase text-muted mb-2">Active</h6>
+                            <h2 class="mb-0 fw-bold text-success">@Model.StaffList.Count(s => s.Status == "Active")</h2>
+                            <p class="text-muted mb-0">Currently employed</p>
+                        </div>
+                        <div class="icon-circle bg-success-light">
+                            <i class="fas fa-user-check text-success"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6">
+            <div class="card stats-card bg-white border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h6 class="text-uppercase text-muted mb-2">With Department</h6>
+                            <h2 class="mb-0 fw-bold text-info">@Model.StaffList.Count(s =>
+                                                                !string.IsNullOrEmpty(s.DeptCode))</h2>
+                            <p class="text-muted mb-0">Assigned to a department</p>
+                        </div>
+                        <div class="icon-circle bg-info-light">
+                            <i class="fas fa-building text-info"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Actions Bar -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 class="mb-0 fw-bold">Staff Registry</h5>
+                            <p class="text-muted mb-0 small">Manage all ministry staff members and their assignments</p>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <a class="btn btn-uganda-primary d-flex align-items-center" asp-page="Create">
+                                <i class="fas fa-plus-circle me-2"></i>Create New Staff Member
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Search -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <form method="get" class="row g-3">
+                        <div class="col-lg-8">
+                            <div class="input-group input-group-lg">
+                                <span class="input-group-text bg-uganda-primary-light text-uganda-primary">
+                                    <i class="fas fa-search"></i>
+                                </span>
+                                <input type="search" name="search" value="@Model.Search" class="form-control"
+                                    placeholder="Search staff (ID, name, email, dept, role)..." />
+                                <button class="btn btn-uganda-primary" type="submit">
+                                    <i class="fas fa-search me-1"></i>Search
+                                </button>
+                                @if (!string.IsNullOrEmpty(Model.Search))
+                                {
+                                    <a class="btn btn-outline-secondary" href="?">
+                                        <i class="fas fa-times me-1"></i>Clear
+                                    </a>
+                                }
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Staff Table -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="bg-light">
+                                <tr>
+                                    <th class="fw-medium text-uganda-primary">Staff ID</th>
+                                    <th class="fw-medium text-uganda-primary">Name</th>
+                                    <th class="fw-medium text-uganda-primary">Email</th>
+                                    <th class="fw-medium text-uganda-primary">Department</th>
+                                    <th class="fw-medium text-uganda-primary">Title</th>
+                                    <th class="fw-medium text-uganda-primary">Status</th>
+                                    <th class="fw-medium text-uganda-primary text-end pe-4">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model.StaffList)
+                                {
+                                    <tr class="staff-row">
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <div class="staff-icon me-2">
+                                                    <i class="fas fa-user text-uganda-primary"></i>
+                                                </div>
+                                                <div>
+                                                    <div class="fw-bold">@item.StaffId</div>
+                                                    <small class="text-muted">ID</small>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="fw-medium">@(item.FirstName + " " + item.LastName)</div>
+                                            @if (!string.IsNullOrEmpty(item.Role))
+                                            {
+                                                <small class="text-muted">@item.Role</small>
+                                            }
+                                        </td>
+                                        <td>
+                                            @if (!string.IsNullOrEmpty(item.Email))
+                                            {
+                                                <a href="mailto:@item.Email" class="text-decoration-none">@item.Email</a>
+                                            }
+                                            else
+                                            {
+                                                <span class="text-muted">— No email —</span>
+                                            }
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-uganda-primary-light text-uganda-primary px-3 py-2">
+                                                @(item.DeptCode ?? "— Unassigned —")
+                                            </span>
+                                        </td>
+                                        <td>
+                                            @(string.IsNullOrEmpty(item.Title) ? "— No title —" : item.Title)
+                                        </td>
+                                        <td>
+                                            <span
+                                                class="badge px-3 py-2 
+                                                            @(item.Status == "Active" ? "bg-success-light text-success" :
+                                                                                                                                                                                                    item.Status == "Terminated" || item.TerminationDate.HasValue ? "bg-warning-light text-warning" : 
+                                                                                                                                                                                                    "bg-secondary text-white")">
+                                                @item.Status
+                                            </span>
+                                        </td>
+                                        <td class="text-end pe-4">
+                                            <div class="btn-group" role="group">
+                                                <a asp-page="Details" asp-route-id="@item.StaffId"
+                                                    class="btn btn-sm btn-outline-info" data-bs-toggle="tooltip"
+                                                    title="View Details">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                                <a asp-page="Edit" asp-route-id="@item.StaffId"
+                                                    class="btn btn-sm btn-outline-warning" data-bs-toggle="tooltip"
+                                                    title="Edit Staff">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                                <a asp-page="Delete" asp-route-id="@item.StaffId"
+                                                    class="btn btn-sm btn-outline-danger" data-bs-toggle="tooltip"
+                                                    title="Delete Staff">
+                                                    <i class="fas fa-trash-alt"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+
+                                @if (!Model.StaffList.Any())
+                                {
+                                    <tr>
+                                        <td colspan="7" class="text-center py-5">
+                                            <div class="py-4">
+                                                <i class="fas fa-users fa-3x text-muted mb-3"></i>
+                                                <h5 class="text-muted">No staff members found</h5>
+                                                <p class="text-muted mb-4">
+                                                    @(string.IsNullOrEmpty(Model.Search)
+                                                                                                    ? "Create your first staff member to get started."
+                                                                                                    : "No staff match your search criteria.")
+                                                </p>
+                                                <a class="btn btn-uganda-primary" asp-page="Create">
+                                                    <i class="fas fa-plus-circle me-2"></i>Create First Staff Member
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Table Footer -->
+                @if (Model.StaffList.Any())
+                {
+                    <div class="card-footer bg-white border-0 py-3">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="text-muted">
+                                Showing <strong>@Model.StaffList.Count()</strong> staff member(s)
+                                @if (!string.IsNullOrEmpty(Model.Search))
+                                {
+                                    <span>matching "<strong>@Model.Search</strong>"</span>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Styles and scripts moved to wwwroot/css/pages.css and wwwroot/js/pages.js -->

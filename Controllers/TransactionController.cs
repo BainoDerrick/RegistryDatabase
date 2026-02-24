@@ -18,14 +18,41 @@ namespace RegistryAPI.Controllers
 
         // GET: api/transactions
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Transaction>>> GetTransactions()
+        public async Task<ActionResult<IEnumerable<Transaction>>> GetTransactions(
+            [FromQuery] string? search = null,
+            [FromQuery] string? staffId = null,
+            [FromQuery] string? transactionType = null,
+            [FromQuery] string? status = null,
+            [FromQuery] string? details = null,
+            [FromQuery] string? sequenceId = null,
+            [FromQuery] string? displayNumber = null)
         {
             try
             {
-                return await _context.Transactions
+                IQueryable<Transaction> query = _context.Transactions
                     .Include(t => t.Staff)
-                    .Include(t => t.File)
-                    .ToListAsync();
+                    .Include(t => t.File);
+
+                if (!string.IsNullOrEmpty(search))
+                {
+                    var t = search.Trim().ToLower();
+                    query = query.Where(x => (x.TransactionId.ToString().Contains(t))
+                                           || (x.StaffId != null && x.StaffId.ToLower().Contains(t))
+                                           || (x.TransactionType != null && x.TransactionType.ToLower().Contains(t))
+                                           || (x.Status != null && x.Status.ToLower().Contains(t))
+                                           || (x.Details != null && x.Details.ToLower().Contains(t))
+                                           || (x.SequenceId != null && x.SequenceId.ToLower().Contains(t))
+                                           || (x.DisplayNumber != null && x.DisplayNumber.ToLower().Contains(t)));
+                }
+
+                if (!string.IsNullOrEmpty(staffId)) { var t = staffId.Trim().ToLower(); query = query.Where(x => x.StaffId != null && x.StaffId.ToLower() == t); }
+                if (!string.IsNullOrEmpty(transactionType)) { var t = transactionType.Trim().ToLower(); query = query.Where(x => x.TransactionType != null && x.TransactionType.ToLower().Contains(t)); }
+                if (!string.IsNullOrEmpty(status)) { var t = status.Trim().ToLower(); query = query.Where(x => x.Status != null && x.Status.ToLower().Contains(t)); }
+                if (!string.IsNullOrEmpty(details)) { var t = details.Trim().ToLower(); query = query.Where(x => x.Details != null && x.Details.ToLower().Contains(t)); }
+                if (!string.IsNullOrEmpty(sequenceId)) { var t = sequenceId.Trim().ToLower(); query = query.Where(x => x.SequenceId != null && x.SequenceId.ToLower().Contains(t)); }
+                if (!string.IsNullOrEmpty(displayNumber)) { var t = displayNumber.Trim().ToLower(); query = query.Where(x => x.DisplayNumber != null && x.DisplayNumber.ToLower().Contains(t)); }
+
+                return await query.ToListAsync();
             }
             catch (Exception ex)
             {
@@ -61,165 +88,23 @@ namespace RegistryAPI.Controllers
         [HttpPost]
         public async Task<ActionResult<Transaction>> CreateTransaction(Transaction transaction)
         {
-            try
-            {
-                if (!ModelState.IsValid)
-                {
-                    return BadRequest(ModelState);
-                }
-
-                // Validate required TransactionId
-                if (transaction.TransactionId == 0 || transaction.TransactionId < 0)
-                {
-                    ModelState.AddModelError("transactionId", "Transaction ID is required and must be a positive integer.");
-                    return BadRequest(ModelState);
-                }
-
-                // Validate required fields
-                if (string.IsNullOrEmpty(transaction.StaffId))
-                {
-                    ModelState.AddModelError("staffId", "Staff ID is required.");
-                    return BadRequest(ModelState);
-                }
-                if (transaction.TransactionDate == default)
-                {
-                    ModelState.AddModelError("transactionDate", "Transaction date is required.");
-                    return BadRequest(ModelState);
-                }
-                if (string.IsNullOrEmpty(transaction.CreatedBy))
-                {
-                    ModelState.AddModelError("createdBy", "Created by is required.");
-                    return BadRequest(ModelState);
-                }
-
-                // Validate foreign keys
-                if (!await _context.Staff.AnyAsync(s => s.StaffId == transaction.StaffId))
-                {
-                    ModelState.AddModelError("staffId", $"Staff with ID {transaction.StaffId} does not exist.");
-                }
-                if (transaction.FileId.HasValue && !await _context.Files.AnyAsync(f => f.FileId == transaction.FileId))
-                {
-                    ModelState.AddModelError("fileId", $"File with ID {transaction.FileId} does not exist.");
-                }
-
-                if (!ModelState.IsValid)
-                {
-                    return BadRequest(ModelState);
-                }
-
-                // Check for duplicate TransactionId
-                if (await _context.Transactions.AnyAsync(t => t.TransactionId == transaction.TransactionId))
-                {
-                    ModelState.AddModelError("transactionId", "Transaction ID already exists.");
-                    return BadRequest(ModelState);
-                }
-
-                transaction.CreatedDate = transaction.CreatedDate ?? DateTime.UtcNow;
-                transaction.UpdatedDate = transaction.UpdatedDate ?? DateTime.UtcNow;
-                transaction.UpdatedBy = transaction.UpdatedBy ?? "system";
-
-                _context.Transactions.Add(transaction);
-                await _context.SaveChangesAsync();
-
-                return CreatedAtAction(nameof(GetTransaction), new { id = transaction.TransactionId }, transaction);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
-            }
+            // Manual creation via API disabled; transactions are created automatically by system events.
+            return StatusCode(405, "Manual creation of transactions is disabled.");
         }
 
         // PUT: api/transactions/5
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateTransaction(int id, Transaction transaction)
         {
-            try
-            {
-                if (id != transaction.TransactionId)
-                {
-                    return BadRequest("Transaction ID mismatch.");
-                }
-
-                if (!ModelState.IsValid)
-                {
-                    return BadRequest(ModelState);
-                }
-
-                var existingTransaction = await _context.Transactions.FindAsync(id);
-                if (existingTransaction == null)
-                {
-                    return NotFound();
-                }
-
-                // Apply the recent fix using SetValues to ensure all properties are updated
-                _context.Entry(existingTransaction).CurrentValues.SetValues(transaction);
-
-                // Validate required fields
-                if (string.IsNullOrEmpty(transaction.StaffId))
-                {
-                    ModelState.AddModelError("staffId", "Staff ID is required.");
-                    return BadRequest(ModelState);
-                }
-                if (transaction.TransactionDate == default)
-                {
-                    ModelState.AddModelError("transactionDate", "Transaction date is required.");
-                    return BadRequest(ModelState);
-                }
-                if (string.IsNullOrEmpty(transaction.CreatedBy))
-                {
-                    ModelState.AddModelError("createdBy", "Created by is required.");
-                    return BadRequest(ModelState);
-                }
-
-                // Validate foreign keys if changed
-                if (transaction.StaffId != existingTransaction.StaffId &&
-                    !await _context.Staff.AnyAsync(s => s.StaffId == transaction.StaffId))
-                {
-                    ModelState.AddModelError("staffId", $"Staff with ID {transaction.StaffId} does not exist.");
-                }
-                if (transaction.FileId.HasValue && transaction.FileId != existingTransaction.FileId &&
-                    !await _context.Files.AnyAsync(f => f.FileId == transaction.FileId))
-                {
-                    ModelState.AddModelError("fileId", $"File with ID {transaction.FileId} does not exist.");
-                }
-
-                if (!ModelState.IsValid)
-                {
-                    return BadRequest(ModelState);
-                }
-
-                existingTransaction.UpdatedDate = DateTime.UtcNow;
-                existingTransaction.UpdatedBy = transaction.UpdatedBy ?? "system";
-
-                await _context.SaveChangesAsync();
-                return NoContent();
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
-            }
+            // Manual updates disabled
+            return StatusCode(405, "Manual editing of transactions is disabled.");
         }
 
         // DELETE: api/transactions/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteTransaction(int id)
         {
-            try
-            {
-                var transaction = await _context.Transactions.FindAsync(id);
-                if (transaction == null)
-                {
-                    return NotFound();
-                }
-
-                _context.Transactions.Remove(transaction);
-                await _context.SaveChangesAsync();
-                return NoContent();
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
-            }
+            return StatusCode(405, "Deleting transactions via API is disabled.");
         }
     }
 }

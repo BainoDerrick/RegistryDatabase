@@ -16,3 +16,63 @@
 .card:hover {
     transform: translateY(-2px);
 }
+
+/* Sidebar layout */
+#layout-root {
+    min-height: 100vh;
+}
+
+#sidebar {
+    width: 220px;
+    min-height: 100vh;
+}
+
+#content {
+    transition: margin-left .2s ease;
+}
+
+/* Collapsed sidebar */
+.collapsed #sidebar {
+    width: 60px;
+}
+
+.collapsed #content {
+    margin-left: 60px;
+}
+
+/* Theme variables */
+:root {
+    --bg: #ffffff;
+    --text: #212529;
+    --card-bg: #ffffff;
+}
+
+.theme-dark {
+    --bg: #121212;
+    --text: #e9ecef;
+    --card-bg: #1f1f1f;
+    background-color: var(--bg);
+    color: var(--text);
+}
+
+.theme-dark .card {
+    background-color: var(--card-bg);
+    color: var(--text);
+}
+
+/* Zoom helpers */
+.zoom-100 {
+    font-size: 100%;
+}
+
+.zoom-110 {
+    font-size: 110%;
+}
+
+.zoom-125 {
+    font-size: 125%;
+}
+
+.zoom-150 {
+    font-size: 150%;
+}

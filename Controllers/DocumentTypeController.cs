@@ -18,13 +18,26 @@ namespace RegistryAPI.Controllers
 
         // GET: api/documenttype
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<DocumentType>>> GetDocumentTypes()
+        public async Task<ActionResult<IEnumerable<DocumentType>>> GetDocumentTypes(
+            [FromQuery] string? search = null,
+            [FromQuery] string? typeName = null,
+            [FromQuery] string? description = null)
         {
             try
             {
-                return await _context.DocumentTypes
-                    .Include(dt => dt.Documents)
-                    .ToListAsync();
+                IQueryable<DocumentType> query = _context.DocumentTypes.Include(dt => dt.Documents);
+
+                if (!string.IsNullOrEmpty(search))
+                {
+                    var t = search.Trim().ToLower();
+                    query = query.Where(x => (x.TypeName != null && x.TypeName.ToLower().Contains(t))
+                                           || (x.Description != null && x.Description.ToLower().Contains(t)));
+                }
+
+                if (!string.IsNullOrEmpty(typeName)) { var t = typeName.Trim().ToLower(); query = query.Where(x => x.TypeName != null && x.TypeName.ToLower().Contains(t)); }
+                if (!string.IsNullOrEmpty(description)) { var t = description.Trim().ToLower(); query = query.Where(x => x.Description != null && x.Description.ToLower().Contains(t)); }
+
+                return await query.ToListAsync();
             }
             catch (Exception ex)
             {

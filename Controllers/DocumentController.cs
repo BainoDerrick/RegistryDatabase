@@ -18,14 +18,36 @@ namespace RegistryAPI.Controllers
 
         // GET: api/document
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Document>>> GetDocuments()
+        public async Task<ActionResult<IEnumerable<Document>>> GetDocuments(
+            [FromQuery] string? search = null,
+            [FromQuery] string? documentName = null,
+            [FromQuery] string? description = null,
+            [FromQuery] int? docTypeId = null,
+            [FromQuery] int? fileId = null,
+            [FromQuery] bool? scanned = null)
         {
             try
             {
-                return await _context.Documents
+                IQueryable<Document> query = _context.Documents
                     .Include(d => d.File)
-                    .Include(d => d.DocumentType)
-                    .ToListAsync();
+                    .Include(d => d.DocumentType);
+
+                if (!string.IsNullOrEmpty(search))
+                {
+                    var t = search.Trim().ToLower();
+                    query = query.Where(x => (x.DocumentName != null && x.DocumentName.ToLower().Contains(t))
+                                            || (x.Description != null && x.Description.ToLower().Contains(t))
+                                            || (x.FileId != null && x.FileId.ToString().Contains(t))
+                                            || (x.DocTypeId != null && x.DocTypeId.ToString().Contains(t)));
+                }
+
+                if (!string.IsNullOrEmpty(documentName)) { var t = documentName.Trim().ToLower(); query = query.Where(x => x.DocumentName != null && x.DocumentName.ToLower().Contains(t)); }
+                if (!string.IsNullOrEmpty(description)) { var t = description.Trim().ToLower(); query = query.Where(x => x.Description != null && x.Description.ToLower().Contains(t)); }
+                if (docTypeId.HasValue) query = query.Where(x => x.DocTypeId == docTypeId.Value);
+                if (fileId.HasValue) query = query.Where(x => x.FileId == fileId.Value);
+                if (scanned.HasValue) query = query.Where(x => x.Scanned == scanned.Value);
+
+                return await query.ToListAsync();
             }
             catch (Exception ex)
             {

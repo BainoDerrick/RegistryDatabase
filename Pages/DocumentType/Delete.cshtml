@@ -1,0 +1,151 @@
+@page "{id:int}"
+@model RegistryAPI.Pages.DocumentType.DeleteModel
+@{
+    ViewData["Title"] = "Delete Document Type";
+
+    var userName = User.Identity?.Name;
+    var firstName = "User";
+
+    if (!string.IsNullOrEmpty(userName) && userName.Contains('@'))
+    {
+        firstName = userName.Split('@')[0];
+        firstName = System.Globalization.CultureInfo.CurrentCulture.TextInfo
+        .ToTitleCase(firstName.ToLower());
+    }
+    else if (!string.IsNullOrEmpty(userName))
+    {
+        firstName = userName;
+    }
+}
+
+<div class="container-fluid px-4">
+
+    <!-- Header -->
+    <div class="row align-items-center mb-4 pt-3">
+        <div class="col-md-8">
+            <div class="d-flex align-items-center">
+                <div class="me-3">
+                    <div class="ministry-badge">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                </div>
+                <div>
+                    <h1 class="h3 fw-bold mb-1 text-danger">
+                        Delete Document Type
+                    </h1>
+                    <p class="text-muted mb-0">
+                        Ministry of Works and Transport - Document Registry
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CENTERED CARD -->
+    <div class="row justify-content-center">
+        <div class="col-12 col-lg-8 col-xl-6">
+            <div class="card border-0 shadow-sm border-danger border-2">
+                <div class="card-header bg-white border-0 py-3">
+                    <h5 class="mb-0 fw-bold text-danger">
+                        <i class="fas fa-trash-alt text-danger me-2"></i>
+                        Confirm Document Type Deletion
+                    </h5>
+                </div>
+
+                <div class="card-body">
+
+                    <!-- Main Warning Alert -->
+                    <div class="alert alert-danger bg-danger-light border-0 mb-4">
+                        <div class="d-flex align-items-start">
+                            <div class="me-3 flex-shrink-0">
+                                <i class="fas fa-exclamation-circle fa-2x"></i>
+                            </div>
+                            <div>
+                                <h6 class="alert-heading fw-bold mb-2">Warning: This action cannot be undone!</h6>
+                                <p class="mb-0">Deleting this document type will permanently remove it from the system.
+                                    Documents currently using this type may lose their type reference.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Document Type Details -->
+                    <div class="bg-light rounded p-4 mb-4">
+                        <h6 class="fw-bold text-uganda-primary mb-3">
+                            <i class="fas fa-tag me-2"></i>Document Type to be Deleted
+                        </h6>
+
+                        <div class="row g-4">
+                            <div class="col-md-6">
+                                <div class="detail-item">
+                                    <div class="text-muted small fw-medium">Type ID</div>
+                                    <div class="fw-bold fs-5">
+                                        <i class="fas fa-hashtag text-uganda-primary me-2"></i>
+                                        @Model.DocType.DocTypeId
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-12">
+                                <div class="detail-item">
+                                    <div class="text-muted small fw-medium">Type Name</div>
+                                    <div class="fw-bold fs-5">
+                                        <i class="fas fa-tag text-uganda-primary me-2"></i>
+                                        @Model.DocType.TypeName
+                                    </div>
+                                </div>
+                            </div>
+
+                            @if (!string.IsNullOrEmpty(Model.DocType.Description))
+                            {
+                                <div class="col-12">
+                                    <div class="detail-item">
+                                        <div class="text-muted small fw-medium">Description</div>
+                                        <div class="fw-medium fs-5 text-dark">
+                                            @Model.DocType.Description
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+
+                    <!-- Impact Warning -->
+                    <div class="alert alert-warning bg-warning-light border-0 mb-4">
+                        <h6 class="fw-bold mb-2">
+                            <i class="fas fa-exclamation-triangle me-2"></i>Potential Impact
+                        </h6>
+                        <ul class="mb-0 ps-3 small">
+                            <li>Existing documents referencing this type will show as "Unknown Type"</li>
+                            <li>Users will no longer be able to select this type when creating new documents</li>
+                            <li>Audit logs will record the deletion but the type cannot be recovered</li>
+                        </ul>
+                    </div>
+
+                    <!-- Confirmation Form -->
+                    <form method="post" id="deleteForm">
+                        <input type="hidden" asp-for="DocType.DocTypeId" />
+
+                        <div class="form-check mb-4">
+                            <input class="form-check-input" type="checkbox" id="confirmDelete" required>
+                            <label class="form-check-label fw-medium" for="confirmDelete">
+                                I understand that this action is permanent and cannot be undone
+                            </label>
+                        </div>
+
+                        <!-- Actions -->
+                        <div class="d-flex gap-3 mt-4 pt-4 border-top">
+                            <button type="submit" class="btn btn-danger btn-lg px-5 flex-fill" id="deleteBtn" disabled>
+                                <i class="fas fa-trash-alt me-2"></i>Delete Permanently
+                            </button>
+
+                            <a asp-page="Index" class="btn btn-outline-secondary btn-lg px-5">
+                                <i class="fas fa-times me-2"></i>Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Styles and scripts moved to wwwroot/css/pages.css and wwwroot/js/pages.js -->

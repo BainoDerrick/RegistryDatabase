@@ -1,0 +1,18 @@
+@page
+@model RegistryAPI.Pages.Transaction.IndexModel
+@{
+    ViewData["Title"] = "Transactions - Removed";
+}
+
+<h1>Transactions (Removed)</h1>
+<div class="alert alert-info">Transaction UI has been removed. Transactions are created and managed automatically by the
+    system.</div>
+
+<form method="get" class="mb-3">
+    <div class="input-group">
+        <input type="search" name="search" value="@Model.Search" class="form-control"
+            placeholder="Search transactions (staff, type, status, details)..." />
+        <button class="btn btn-outline-secondary" type="submit">Search</button>
+        <a class="btn btn-outline-secondary" href="?">Clear</a>
+    </div>
+</form>

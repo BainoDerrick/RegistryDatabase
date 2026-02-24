@@ -5,44 +5,159 @@
     Layout = "_LayoutMinimal";
 }
 
-<div class="row justify-content-center">
-    <div class="col-md-6">
-        <div class="card">
-            <div class="card-header">
-                <h3 class="text-center">Create New Account</h3>
-            </div>
-            <div class="card-body">
-                <form method="post">
-                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+<div class="container-fluid min-vh-100 d-flex align-items-center bg-light">
+    <div class="row w-100 justify-content-center">
 
-                    <div class="form-group">
-                        <label asp-for="Input.Email"></label>
-                        <input asp-for="Input.Email" class="form-control" />
-                        <span asp-validation-for="Input.Email" class="text-danger"></span>
+        <div class="col-12 col-md-10 col-lg-8 col-xl-6">
+            <div class="card border-0 shadow-lg">
+
+                <!-- HEADER -->
+                <div class="card-header bg-white border-0 text-center py-4">
+                    <div class="ministry-badge mx-auto mb-3">
+                        <i class="fas fa-user-plus"></i>
                     </div>
 
-                    <div class="form-group">
-                        <label asp-for="Input.Password"></label>
-                        <input asp-for="Input.Password" type="password" class="form-control" />
-                        <span asp-validation-for="Input.Password" class="text-danger"></span>
-                    </div>
+                    <h3 class="fw-bold text-uganda-primary mb-1">
+                        Create New Account
+                    </h3>
 
-                    <div class="form-group">
-                        <label asp-for="Input.ConfirmPassword"></label>
-                        <input asp-for="Input.ConfirmPassword" type="password" class="form-control" />
-                        <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
-                    </div>
-
-                    <button type="submit" class="btn btn-primary btn-block">Register</button>
-                </form>
-
-                <div class="text-center mt-3">
-                    <p>Already have an account? <a asp-page="/Account/Login">Login here</a></p>
+                    <p class="text-muted mb-0">
+                        Ministry of Works and Transport — Document Registry System
+                    </p>
                 </div>
+
+                <!-- BODY -->
+                <div class="card-body p-4 p-lg-5">
+
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger mb-4"></div>
+
+                    <form method="post">
+
+                        <!-- Email -->
+                        <div class="mb-4">
+                            <label asp-for="Input.Email" class="form-label fw-medium">
+                                Email Address
+                            </label>
+                            <div class="input-group input-group-lg">
+                                <span class="input-group-text">
+                                    <i class="fas fa-envelope"></i>
+                                </span>
+                                <input asp-for="Input.Email" class="form-control"
+                                    placeholder="Enter official email address" autocomplete="username" />
+                            </div>
+                            <span asp-validation-for="Input.Email" class="text-danger small"></span>
+                        </div>
+
+                        <!-- Password -->
+                        <div class="mb-4">
+                            <label asp-for="Input.Password" class="form-label fw-medium">
+                                Password
+                            </label>
+                            <div class="input-group input-group-lg">
+                                <span class="input-group-text">
+                                    <i class="fas fa-lock"></i>
+                                </span>
+                                <input asp-for="Input.Password" type="password" class="form-control"
+                                    placeholder="Create a strong password" autocomplete="new-password" />
+                            </div>
+                            <span asp-validation-for="Input.Password" class="text-danger small"></span>
+                        </div>
+
+                        <!-- Confirm Password -->
+                        <div class="mb-4">
+                            <label asp-for="Input.ConfirmPassword" class="form-label fw-medium">
+                                Confirm Password
+                            </label>
+                            <div class="input-group input-group-lg">
+                                <span class="input-group-text">
+                                    <i class="fas fa-lock"></i>
+                                </span>
+                                <input asp-for="Input.ConfirmPassword" type="password" class="form-control"
+                                    placeholder="Re-enter password" autocomplete="new-password" />
+                            </div>
+                            <span asp-validation-for="Input.ConfirmPassword" class="text-danger small"></span>
+                        </div>
+
+                        <!-- Submit -->
+                        <button type="submit" class="btn btn-uganda-primary btn-lg w-100">
+                            <i class="fas fa-user-check me-2"></i>
+                            Register Account
+                        </button>
+                    </form>
+
+                    <!-- Login Link -->
+                    <div class="text-center mt-4">
+                        <p class="mb-0 text-muted">
+                            Already have an account?
+                            <a asp-page="/Account/Login" class="text-uganda-primary fw-medium">
+                                Login here
+                            </a>
+                        </p>
+                    </div>
+                </div>
+
+                <!-- FOOTER -->
+                <div class="card-footer bg-white border-0 text-center py-3">
+                    <small class="text-muted">
+                        © @(DateTime.Now.Year) Ministry of Works and Transport — Government of Uganda
+                    </small>
+                </div>
+
             </div>
         </div>
+
     </div>
 </div>
+
+<style>
+    :root {
+        --uganda-primary: #0066cc;
+        --uganda-primary-light: rgba(0, 102, 204, 0.1);
+    }
+
+    .text-uganda-primary {
+        color: var(--uganda-primary) !important;
+    }
+
+    .ministry-badge {
+        width: 72px;
+        height: 72px;
+        background: linear-gradient(135deg, var(--uganda-primary), #004080);
+        border-radius: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        font-size: 30px;
+    }
+
+    .input-group-text {
+        background-color: var(--uganda-primary-light);
+        color: var(--uganda-primary);
+        border: none;
+    }
+
+    .btn-uganda-primary {
+        background-color: var(--uganda-primary);
+        border: none;
+        color: #fff;
+        font-weight: 500;
+    }
+
+    .btn-uganda-primary:hover {
+        background-color: #0052a3;
+        color: #fff;
+    }
+
+    .card {
+        border-radius: 20px;
+        overflow: hidden;
+    }
+
+    .alert {
+        border-radius: 0.5rem;
+    }
+</style>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />

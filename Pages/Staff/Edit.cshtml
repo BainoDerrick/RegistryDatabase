@@ -1,0 +1,229 @@
+@page "{id}"
+@model RegistryAPI.Pages.Staff.EditModel
+@{
+    ViewData["Title"] = "Edit Staff";
+
+    var userName = User.Identity?.Name;
+    var firstName = "User";
+
+    if (!string.IsNullOrEmpty(userName) && userName.Contains('@'))
+    {
+        firstName = userName.Split('@')[0];
+        firstName = System.Globalization.CultureInfo.CurrentCulture.TextInfo
+        .ToTitleCase(firstName.ToLower());
+    }
+    else if (!string.IsNullOrEmpty(userName))
+    {
+        firstName = userName;
+    }
+}
+
+<div class="container-fluid px-4">
+
+    <!-- Header -->
+    <div class="row align-items-center mb-4 pt-3">
+        <div class="col-md-8">
+            <div class="d-flex align-items-center">
+                <div class="me-3">
+                    <div class="ministry-badge">
+                        <i class="fas fa-user-edit"></i>
+                    </div>
+                </div>
+                <div>
+                    <h1 class="h3 fw-bold mb-1 text-uganda-primary">
+                        Edit Staff Member
+                    </h1>
+                    <p class="text-muted mb-0">
+                        Ministry of Works and Transport - Staff Registry
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FULL WIDTH FORM -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-0 py-3">
+                    <h5 class="mb-0 fw-bold">
+                        <i class="fas fa-edit text-uganda-primary me-2"></i>
+                        Staff Information
+                    </h5>
+                </div>
+
+                <div class="card-body">
+                    <form method="post">
+
+                        <input type="hidden" asp-for="Staff.StaffId" />
+
+                        <div class="row g-4">
+
+                            <!-- Staff ID Display -->
+                            <div class="col-12">
+                                <div class="alert alert-info border-0">
+                                    <i class="fas fa-id-badge me-2"></i>
+                                    <strong>Staff ID:</strong> @Model.Staff.StaffId (cannot be edited)
+                                </div>
+                            </div>
+
+                            <!-- First Name & Last Name -->
+                            <div class="col-md-6">
+                                <label class="form-label fw-medium">First Name</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">
+                                        <i class="fas fa-user"></i>
+                                    </span>
+                                    <input asp-for="Staff.FirstName" class="form-control form-control-lg"
+                                        placeholder="Enter first name" />
+                                </div>
+                                <span asp-validation-for="Staff.FirstName" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-medium">Last Name</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">
+                                        <i class="fas fa-user"></i>
+                                    </span>
+                                    <input asp-for="Staff.LastName" class="form-control form-control-lg"
+                                        placeholder="Enter last name" />
+                                </div>
+                                <span asp-validation-for="Staff.LastName" class="text-danger small"></span>
+                            </div>
+
+                            <!-- Email -->
+                            <div class="col-md-6">
+                                <label class="form-label fw-medium">Email Address</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">
+                                        <i class="fas fa-envelope"></i>
+                                    </span>
+                                    <input asp-for="Staff.Email" class="form-control form-control-lg"
+                                        placeholder="staff@example.go.ug" />
+                                </div>
+                                <span asp-validation-for="Staff.Email" class="text-danger small"></span>
+                            </div>
+
+                            <!-- Department -->
+                            <div class="col-md-6">
+                                <label class="form-label fw-medium">Department</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">
+                                        <i class="fas fa-building"></i>
+                                    </span>
+                                    <select asp-for="Staff.DeptCode" class="form-select form-select-lg"
+                                        asp-items="@(ViewData["DepartmentOptions"] as IEnumerable<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>)">
+                                        <option value="">-- Select department --</option>
+                                    </select>
+                                </div>
+                                <span asp-validation-for="Staff.DeptCode" class="text-danger small"></span>
+                            </div>
+
+                            <!-- Employment Type -->
+                            <div class="col-md-6">
+                                <label class="form-label fw-medium">Employment Type</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">
+                                        <i class="fas fa-briefcase"></i>
+                                    </span>
+                                    <select asp-for="Staff.EmploymentType" class="form-select form-select-lg"
+                                        asp-items="@(ViewData["EmploymentTypeOptions"] as IEnumerable<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>)">
+                                        <option value="">-- Select employment type --</option>
+                                    </select>
+                                </div>
+                                <span asp-validation-for="Staff.EmploymentType" class="text-danger small"></span>
+                            </div>
+
+                            <!-- Title -->
+                            <div class="col-md-6">
+                                <label class="form-label fw-medium">Job Title</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">
+                                        <i class="fas fa-id-badge"></i>
+                                    </span>
+                                    <input asp-for="Staff.Title" class="form-control form-control-lg"
+                                        placeholder="e.g., Engineer, Administrator" />
+                                </div>
+                                <span asp-validation-for="Staff.Title" class="text-danger small"></span>
+                            </div>
+
+                            <!-- Hire Date -->
+                            <div class="col-md-6">
+                                <label class="form-label fw-medium">Hire Date</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">
+                                        <i class="fas fa-calendar-check"></i>
+                                    </span>
+                                    <input asp-for="Staff.HireDate" type="date" class="form-control form-control-lg" />
+                                </div>
+                                <span asp-validation-for="Staff.HireDate" class="text-danger small"></span>
+                            </div>
+
+                            <!-- Termination Date -->
+                            <div class="col-md-6">
+                                <label class="form-label fw-medium">Termination Date (Optional)</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">
+                                        <i class="fas fa-calendar-times"></i>
+                                    </span>
+                                    <input asp-for="Staff.TerminationDate" type="date"
+                                        class="form-control form-control-lg" />
+                                </div>
+                                <span asp-validation-for="Staff.TerminationDate" class="text-danger small"></span>
+                            </div>
+
+                            <!-- Status -->
+                            <div class="col-md-6">
+                                <label class="form-label fw-medium">Status</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">
+                                        <i class="fas fa-user-clock"></i>
+                                    </span>
+                                    <select asp-for="Staff.Status" class="form-select form-select-lg"
+                                        asp-items="@(ViewData["StatusOptions"] as IEnumerable<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>)">
+                                        <option value="">-- Select status --</option>
+                                    </select>
+                                </div>
+                                <span asp-validation-for="Staff.Status" class="text-danger small"></span>
+                            </div>
+
+                            <!-- Role -->
+                            <div class="col-md-6">
+                                <label class="form-label fw-medium">Role / Position</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">
+                                        <i class="fas fa-user-tie"></i>
+                                    </span>
+                                    <input asp-for="Staff.Role" class="form-control form-control-lg"
+                                        placeholder="e.g., Director, Clerk" />
+                                </div>
+                                <span asp-validation-for="Staff.Role" class="text-danger small"></span>
+                            </div>
+
+                        </div>
+
+                        <!-- Actions -->
+                        <div class="d-flex gap-3 mt-4 pt-4 border-top">
+                            <button type="submit" class="btn btn-uganda-primary btn-lg px-5">
+                                <i class="fas fa-save me-2"></i>Save Changes
+                            </button>
+
+                            <a asp-page="Index" class="btn btn-outline-secondary btn-lg px-5">
+                                <i class="fas fa-times me-2"></i>Cancel
+                            </a>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- Styles moved to ~/css/pages.css (consolidated) -->
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -1,0 +1,18 @@
+/* Add your custom styles here */
+.validation-summary-errors {
+    color: #dc3545;
+}
+
+.field-validation-error {
+    color: #dc3545;
+    font-size: 0.875rem;
+}
+
+/* Custom styles for the dashboard */
+.card {
+    transition: transform 0.2s;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+}

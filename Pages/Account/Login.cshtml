@@ -5,43 +5,217 @@
     Layout = "_LayoutMinimal";
 }
 
-<div class="row justify-content-center">
-    <div class="col-md-6">
-        <div class="card">
-            <div class="card-header">
-                <h3 class="text-center">Login to Registry System</h3>
+<div class="container-fluid min-vh-100">
+    <div class="row min-vh-100">
+
+        <!-- LEFT BRANDING PANEL -->
+        <div
+            class="col-lg-6 d-none d-lg-flex align-items-center justify-content-center bg-uganda-primary text-white p-5">
+            <div class="text-center px-4">
+                <div class="ministry-badge-lg mb-4 mx-auto">
+                    <i class="fas fa-road"></i>
+                </div>
+
+                <h1 class="fw-bold mb-3">
+                    Registry Management System
+                </h1>
+
+                <h5 class="fw-normal mb-4">
+                    Ministry of Works and Transport
+                </h5>
+
+                <p class="opacity-75 fs-5">
+                    Securely manage, register, and retrieve official ministry documents
+                    with accuracy and accountability.
+                </p>
+
+                <div class="mt-5">
+                    <div class="d-flex align-items-center justify-content-center mb-3">
+                        <i class="fas fa-shield-alt me-2"></i>
+                        <span>Secure Access</span>
+                    </div>
+                    <div class="d-flex align-items-center justify-content-center mb-3">
+                        <i class="fas fa-folder-open me-2"></i>
+                        <span>Centralized Records</span>
+                    </div>
+                    <div class="d-flex align-items-center justify-content-center">
+                        <i class="fas fa-clock me-2"></i>
+                        <span>Audit & Tracking</span>
+                    </div>
+                </div>
             </div>
-            <div class="card-body">
-                <form method="post">
-                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        </div>
 
-                    <div class="form-group">
-                        <label asp-for="Input.Email"></label>
-                        <input asp-for="Input.Email" class="form-control" />
-                        <span asp-validation-for="Input.Email" class="text-danger"></span>
+        <!-- RIGHT LOGIN FORM PANEL -->
+        <div class="col-12 col-lg-6 d-flex align-items-center justify-content-center bg-light px-4 px-lg-5">
+            <div class="w-100" style="max-width: 600px;">
+
+                <div class="text-center mb-4 d-lg-none">
+                    <div class="ministry-badge mb-3 mx-auto">
+                        <i class="fas fa-shield-alt"></i>
                     </div>
+                    <h3 class="fw-bold text-uganda-primary">
+                        Registry System Login
+                    </h3>
+                    <p class="text-muted">
+                        Ministry of Works and Transport
+                    </p>
+                </div>
 
-                    <div class="form-group">
-                        <label asp-for="Input.Password"></label>
-                        <input asp-for="Input.Password" type="password" class="form-control" />
-                        <span asp-validation-for="Input.Password" class="text-danger"></span>
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body p-4 p-lg-5">
+
+                        <h4 class="fw-bold mb-4 text-center text-uganda-primary">
+                            Sign In to Your Account
+                        </h4>
+
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger mb-4"></div>
+
+                        <form method="post">
+
+                            <!-- EMAIL -->
+                            <div class="mb-4">
+                                <label asp-for="Input.Email" class="form-label fw-medium">
+                                    Email Address
+                                </label>
+                                <div class="input-group input-group-lg">
+                                    <span class="input-group-text">
+                                        <i class="fas fa-envelope"></i>
+                                    </span>
+                                    <input asp-for="Input.Email" class="form-control" placeholder="name@works.go.ug"
+                                        autocomplete="username" />
+                                </div>
+                                <span asp-validation-for="Input.Email" class="text-danger small"></span>
+                            </div>
+
+                            <!-- PASSWORD -->
+                            <div class="mb-4">
+                                <label asp-for="Input.Password" class="form-label fw-medium">
+                                    Password
+                                </label>
+                                <div class="input-group input-group-lg">
+                                    <span class="input-group-text">
+                                        <i class="fas fa-lock"></i>
+                                    </span>
+                                    <input asp-for="Input.Password" type="password" class="form-control"
+                                        placeholder="Enter your password" autocomplete="current-password" />
+                                </div>
+                                <span asp-validation-for="Input.Password" class="text-danger small"></span>
+                            </div>
+
+                            <!-- REMEMBER ME -->
+                            <div class="d-flex justify-content-between align-items-center mb-4">
+                                <div class="form-check">
+                                    <input asp-for="Input.RememberMe" class="form-check-input" />
+                                    <label asp-for="Input.RememberMe" class="form-check-label fw-medium">
+                                        Remember me
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- LOGIN BUTTON -->
+                            <button type="submit" class="btn btn-uganda-primary btn-lg w-100">
+                                <i class="fas fa-sign-in-alt me-2"></i>
+                                Login
+                            </button>
+                        </form>
+
+                        <div class="text-center mt-4">
+                            <p class="mb-0 text-muted">
+                                Don't have an account?
+                                <a asp-page="/Account/Register" class="text-uganda-primary fw-medium">
+                                    Register here
+                                </a>
+                            </p>
+                        </div>
                     </div>
+                </div>
 
-                    <div class="form-group form-check">
-                        <input asp-for="Input.RememberMe" class="form-check-input" />
-                        <label asp-for="Input.RememberMe" class="form-check-label">Remember me</label>
-                    </div>
-
-                    <button type="submit" class="btn btn-primary btn-block">Login</button>
-                </form>
-
-                <div class="text-center mt-3">
-                    <p>Don't have an account? <a asp-page="/Account/Register">Register here</a></p>
+                <div class="text-center mt-4">
+                    <small class="text-muted">
+                        © @(DateTime.Now.Year) Ministry of Works and Transport — Government of Uganda
+                    </small>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<style>
+    :root {
+        --uganda-primary: #0066cc;
+        --uganda-primary-light: rgba(0, 102, 204, 0.1);
+    }
+
+    .bg-uganda-primary {
+        background-color: var(--uganda-primary);
+    }
+
+    .text-uganda-primary {
+        color: var(--uganda-primary) !important;
+    }
+
+    .ministry-badge {
+        width: 70px;
+        height: 70px;
+        background: linear-gradient(135deg, var(--uganda-primary), #004080);
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        font-size: 30px;
+    }
+
+    .ministry-badge-lg {
+        width: 110px;
+        height: 110px;
+        background: linear-gradient(135deg, #ffffff33, #ffffff22);
+        border-radius: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 48px;
+        color: #fff;
+    }
+
+    .input-group-text {
+        background-color: var(--uganda-primary-light);
+        color: var(--uganda-primary);
+        border: none;
+    }
+
+    .btn-uganda-primary {
+        background-color: var(--uganda-primary);
+        border: none;
+        color: #fff;
+        font-weight: 500;
+    }
+
+    .btn-uganda-primary:hover {
+        background-color: #0052a3;
+    }
+
+    .form-check-input:checked {
+        background-color: var(--uganda-primary);
+        border-color: var(--uganda-primary);
+    }
+
+    .form-check-input:focus {
+        box-shadow: 0 0 0 0.25rem rgba(0, 102, 204, 0.25);
+        border-color: var(--uganda-primary);
+    }
+
+    .card {
+        border-radius: 18px;
+    }
+
+    .alert {
+        border-radius: 10px;
+    }
+</style>
+
+<!-- Styles moved to ~/css/pages.css (consolidated) -->
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />

@@ -19,14 +19,29 @@ namespace RegistryAPI.Controllers
 
         // GET: api/file
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<File>>> GetFiles()
+        public async Task<ActionResult<IEnumerable<File>>> GetFiles(
+            [FromQuery] string? search = null,
+            [FromQuery] string? staffId = null,
+            [FromQuery] string? fileStatus = null)
         {
             try
             {
-                return await _context.Files
+                IQueryable<File> query = _context.Files
                     .Include(f => f.Staff)
-                    .Include(f => f.Documents)
-                    .ToListAsync();
+                    .Include(f => f.Documents);
+
+                if (!string.IsNullOrEmpty(search))
+                {
+                    var t = search.Trim().ToLower();
+                    query = query.Where(x => (x.FileId.ToString().Contains(t))
+                                           || (x.StaffId != null && x.StaffId.ToLower().Contains(t))
+                                           || (x.FileStatus != null && x.FileStatus.ToLower().Contains(t)));
+                }
+
+                if (!string.IsNullOrEmpty(staffId)) { var t = staffId.Trim().ToLower(); query = query.Where(x => x.StaffId != null && x.StaffId.ToLower() == t); }
+                if (!string.IsNullOrEmpty(fileStatus)) { var t = fileStatus.Trim().ToLower(); query = query.Where(x => x.FileStatus != null && x.FileStatus.ToLower().Contains(t)); }
+
+                return await query.ToListAsync();
             }
             catch (Exception ex)
             {

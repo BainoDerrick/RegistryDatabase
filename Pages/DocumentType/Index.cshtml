@@ -1,0 +1,252 @@
+@page
+@model RegistryAPI.Pages.DocumentType.IndexModel
+@{
+    ViewData["Title"] = "Manage Document Types";
+
+    var userName = User.Identity?.Name;
+    var firstName = "User";
+
+    if (!string.IsNullOrEmpty(userName) && userName.Contains('@'))
+    {
+        firstName = userName.Split('@')[0];
+        firstName = System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(firstName.ToLower());
+    }
+    else if (!string.IsNullOrEmpty(userName))
+    {
+        firstName = userName;
+    }
+}
+
+<div class="container-fluid px-4">
+    <!-- Header -->
+    <div class="row align-items-center mb-4 pt-3">
+        <div class="col-md-8">
+            <div class="d-flex align-items-center">
+                <div class="me-3">
+                    <div class="ministry-badge">
+                        <i class="fas fa-tags"></i>
+                    </div>
+                </div>
+                <div>
+                    <h1 class="h3 fw-bold mb-1 text-uganda-primary">Document Type Management</h1>
+                    <p class="text-muted mb-0">Ministry of Works and Transport - Document Registry System</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="row g-4 mb-4">
+        <div class="col-xl-3 col-md-6">
+            <div class="card stats-card bg-white border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h6 class="text-uppercase text-muted mb-2">Total Types</h6>
+                            <h2 class="mb-0 fw-bold text-uganda-black">@Model.DocumentTypes.Count()</h2>
+                            <p class="text-muted mb-0">All document types</p>
+                        </div>
+                        <div class="icon-circle bg-uganda-primary-light">
+                            <i class="fas fa-tags text-uganda-primary"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+        <div class="col-xl-3 col-md-6">
+            <div class="card stats-card bg-white border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h6 class="text-uppercase text-muted mb-2">With Description</h6>
+                            <h2 class="mb-0 fw-bold text-info">@Model.DocumentTypes.Count(t =>
+                                                                !string.IsNullOrEmpty(t.Description))</h2>
+                            <p class="text-muted mb-0">Detailed types</p>
+                        </div>
+                        <div class="icon-circle bg-info-light">
+                            <i class="fas fa-align-left text-info"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6">
+            <div class="card stats-card bg-white border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h6 class="text-uppercase text-muted mb-2">Recently Added</h6>
+                            <h2 class="mb-0 fw-bold text-warning">0</h2>
+                            <p class="text-muted mb-0">Last 30 days</p>
+                        </div>
+                        <div class="icon-circle bg-warning-light">
+                            <i class="fas fa-clock text-warning"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Actions Bar -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 class="mb-0 fw-bold">Document Type Registry</h5>
+                            <p class="text-muted mb-0 small">Manage categories and classifications for ministry
+                                documents</p>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <a class="btn btn-uganda-primary d-flex align-items-center" asp-page="Create">
+                                <i class="fas fa-plus-circle me-2"></i>Create New Document Type
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Search -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <form method="get" class="row g-3">
+                        <div class="col-lg-8">
+                            <div class="input-group input-group-lg">
+                                <span class="input-group-text bg-uganda-primary-light text-uganda-primary">
+                                    <i class="fas fa-search"></i>
+                                </span>
+                                <input type="search" name="search" value="@Model.Search" class="form-control"
+                                    placeholder="Search document types (name, description)..." />
+                                <button class="btn btn-uganda-primary" type="submit">
+                                    <i class="fas fa-search me-1"></i>Search
+                                </button>
+                                @if (!string.IsNullOrEmpty(Model.Search))
+                                {
+                                    <a class="btn btn-outline-secondary" href="?">
+                                        <i class="fas fa-times me-1"></i>Clear
+                                    </a>
+                                }
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Document Types Table -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="bg-light">
+                                <tr>
+                                    <th class="fw-medium text-uganda-primary">Type ID</th>
+                                    <th class="fw-medium text-uganda-primary">Type Name</th>
+                                    <th class="fw-medium text-uganda-primary">Description</th>
+                                    <th class="fw-medium text-uganda-primary text-end pe-4">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model.DocumentTypes)
+                                {
+                                    <tr class="document-type-row">
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <div class="type-icon me-2">
+                                                    <i class="fas fa-tag text-uganda-primary"></i>
+                                                </div>
+                                                <div>
+                                                    <div class="fw-bold">@item.DocTypeId</div>
+                                                    <small class="text-muted">ID</small>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="fw-medium">@item.TypeName</div>
+                                            <small class="text-muted">Category</small>
+                                        </td>
+                                        <td>
+                                            <div class="text-muted">
+                                                @(string.IsNullOrEmpty(item.Description) ? "— No description —" :
+                                                                                            item.Description)
+                                            </div>
+                                        </td>
+                                        <td class="text-end pe-4">
+                                            <div class="btn-group" role="group">
+                                                <a asp-page="Details" asp-route-id="@item.DocTypeId"
+                                                    class="btn btn-sm btn-outline-info" data-bs-toggle="tooltip"
+                                                    title="View Details">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                                <a asp-page="Edit" asp-route-id="@item.DocTypeId"
+                                                    class="btn btn-sm btn-outline-warning" data-bs-toggle="tooltip"
+                                                    title="Edit Type">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                                <a asp-page="Delete" asp-route-id="@item.DocTypeId"
+                                                    class="btn btn-sm btn-outline-danger" data-bs-toggle="tooltip"
+                                                    title="Delete Type">
+                                                    <i class="fas fa-trash-alt"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+
+                                @if (!Model.DocumentTypes.Any())
+                                {
+                                    <tr>
+                                        <td colspan="4" class="text-center py-5">
+                                            <div class="py-4">
+                                                <i class="fas fa-tags fa-3x text-muted mb-3"></i>
+                                                <h5 class="text-muted">No document types found</h5>
+                                                <p class="text-muted mb-4">
+                                                    @(string.IsNullOrEmpty(Model.Search)
+                                                                                                    ? "Create your first document type to categorize documents."
+                                                                                                    : "No types match your search criteria.")
+                                                </p>
+                                                <a class="btn btn-uganda-primary" asp-page="Create">
+                                                    <i class="fas fa-plus-circle me-2"></i>Create First Document Type
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Table Footer -->
+                @if (Model.DocumentTypes.Any())
+                {
+                    <div class="card-footer bg-white border-0 py-3">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="text-muted">
+                                Showing <strong>@Model.DocumentTypes.Count()</strong> document type(s)
+                                @if (!string.IsNullOrEmpty(Model.Search))
+                                {
+                                    <span>matching "<strong>@Model.Search</strong>"</span>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Styles and scripts moved to wwwroot/css/pages.css and wwwroot/js/pages.js -->
